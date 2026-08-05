@@ -1,3 +1,5 @@
+<!-- marcacoes.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marcações</title>
     <link rel="stylesheet" href="marcacoes.css">
-    <script src="marcacoes.js"></script>
+    <link rel="stylesheet" href="calendario.css">
+    <script src="marcacoes.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 </head>
 <body>
@@ -28,25 +31,25 @@
             <div class="inner_calendario">
                 <div class="calendario_controlos">
                     <div class="calendar_headings">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <h2 class="month_year">Julho, 2026</h2>
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-left" id="prev"></i>
+                        <h2 class="month_year">Julho, 2026</h2> <!-- o texto é de exemplo (mudado no .js) -->
+                        <i class="fa-solid fa-arrow-right" id="next"></i>
                     </div>
-                    <div class="days_date">
+                    <div class="data">
                         <ul class="dias_semana">
+                            <li>Dom</li>
                             <li>Seg</li>
                             <li>Ter</li>
                             <li>Qua</li>
                             <li>Qui</li>
                             <li>Sex</li>
                             <li>Sab</li>
-                            <li>Dom</li>
                         </ul>
                         <ul class="dias">
                             <li>1</li>
                             <li>2</li>
                             <li>3</li>
-                            <li>4</li>
+                            <li class="desativo">4</li>
                             <li>5</li>
                             <li>6</li>
                             <li>7</li>
@@ -80,5 +83,6 @@
             </div>
         </div>
     </section>
+    
 </body>
 </html>
