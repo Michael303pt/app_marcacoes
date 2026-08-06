@@ -1,3 +1,5 @@
+<!-- marcacoes.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marcações</title>
     <link rel="stylesheet" href="marcacoes.css">
-    <script src="marcacoes.js"></script>
+    <link rel="stylesheet" href="calendario.css">
+    <script src="marcacoes.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 </head>
 <body>
     <header>
@@ -22,8 +26,63 @@
             <option value="Yes3">Yes3</option>
         </select>
     </section>
-    <section class="calendario" id="Hidden">
-        <div class=""></div>
+    <section class="calendario_marc" id="Hidden">
+        <div class="calendario">
+            <div class="inner_calendario">
+                <div class="calendario_controlos">
+                    <div class="calendar_headings">
+                        <i class="fa-solid fa-arrow-left" id="prev"></i>
+                        <h2 class="month_year">Julho, 2026</h2> <!-- o texto é de exemplo (mudado no .js) -->
+                        <i class="fa-solid fa-arrow-right" id="next"></i>
+                    </div>
+                    <div class="data">
+                        <ul class="dias_semana">
+                            <li>Dom</li>
+                            <li>Seg</li>
+                            <li>Ter</li>
+                            <li>Qua</li>
+                            <li>Qui</li>
+                            <li>Sex</li>
+                            <li>Sab</li>
+                        </ul>
+                        <ul class="dias">
+                            <li>1</li>
+                            <li>2</li>
+                            <li>3</li>
+                            <li class="desativo">4</li>
+                            <li>5</li>
+                            <li>6</li>
+                            <li>7</li>
+                            <li>8</li>
+                            <li>9</li>
+                            <li>10</li>
+                            <li>11</li>
+                            <li>12</li>
+                            <li>13</li>
+                            <li>14</li>
+                            <li>15</li>
+                            <li>16</li>
+                            <li>17</li>
+                            <li>18</li>
+                            <li>19</li>
+                            <li>20</li>
+                            <li>21</li>
+                            <li>22</li>
+                            <li>23</li>
+                            <li>24</li>
+                            <li>25</li>
+                            <li>26</li>
+                            <li>27</li>
+                            <li>28</li>
+                            <li>29</li>
+                            <li>30</li>
+                            <li>31</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
+    
 </body>
 </html>

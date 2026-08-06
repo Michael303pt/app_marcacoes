@@ -1,0 +1,85 @@
+/*calendario.css*/
+
+.calendario_marc{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: "poppins", sans-serif;
+  overflow: hidden;
+}
+
+.calendario{
+  background-color: var(--calendario-fundo);
+  color: var(--calendario-font);
+  border-radius: 5px;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 5px px 10px var(--calendario-fundo);
+  height: 465px;
+}
+
+.inner_calendario{
+  padding: 2rem;
+}
+
+.calendar_headings{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.fa-solid.fa-arrow-right,
+.fa-solid.fa-arrow-left{
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.data ul{
+  list-style: none;
+}
+
+.data{
+  margin-top: 1rem;
+}
+
+.data .dias_semana, .dias{
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  text-align: center;
+}
+
+.data .dias_semana li{
+  border-bottom: 2px solid var(--calendario-border-bottom);
+  margin: 0 0.2rem;
+}
+
+.data li{
+  padding: 0.5rem;
+  margin: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 5px;
+  color: var(--calendario-font);
+}
+
+.data .dias li:hover{
+  background-color: var(--calendario-hover);
+  color: var(--calendario-fundo);
+}
+
+.data .dias li.hoje{
+  background: var(--calendario-hoje);
+}
+
+.data .desativo{
+  color: var(--calendario-desativo);
+}
+
+.data li.desativo:hover{
+  color: var(--calendario-desativo);
+  background-color: var(--calendario-fundo);
+}

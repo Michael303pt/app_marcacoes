@@ -1,20 +1,26 @@
-:root{
-    --bg: #1b1714;
-    --surface: #221c18;
-    --gold: #b08d57;
-    --red: #8b2e2e;
-    --cream: #ede6da;
-    --muted: #a89a8c;
-  }
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  html{ scroll-behavior:smooth; }
-  body{
-    background:var(--bg);
-    color:var(--cream);
-    font-family:'Work Sans', sans-serif;
-    font-weight:300;
-  }
-  a{ color:inherit; }
-  img{ max-width:100%; display:block; }
+/*marcacoes.css*/
 
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 6vw; }
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Ruda:wght@400;600;700&display=swap");
+:root{
+  --calendario-fundo: #161616;
+  --calendario-font: white;
+  --calendario-border-bottom: #404040;
+  --calendario-hover: #b3b3b3;
+  --calendario-desativo: #505050;
+  --calendario-hoje: linear-gradient(to bottom, #03a9fa, #2196f3);
+  --calendario-precionado: #dad9d9;
+}
+*{ 
+  box-sizing: border-box; 
+  margin:0; 
+  padding:0; 
+}
+html{ scroll-behavior:smooth; }
+body{
+  font-family:'Work Sans', sans-serif;
+  font-weight:300;
+}
+a{ color:inherit; }
+img{ max-width:100%; display:block; }
+
+.wrap{ max-width:1180px; margin:0 auto; padding:0 6vw; }
