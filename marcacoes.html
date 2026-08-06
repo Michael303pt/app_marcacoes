@@ -19,14 +19,26 @@
     </header>
     <section class="DropDown profissional">
         <select name="Profissional" id="profi">
-            <option value="">escolha o profissional</option>
+            <option value="" disabled selected hidden>escolha o profissional</option>
             <option value="Robert Simon">Robert Simon</option>
             <option value="Yes1">Yes1</option>
             <option value="Yes2">Yes2</option>
             <option value="Yes3">Yes3</option>
         </select>
+
+        <div class="campo-data">
+            <input
+                type="text"
+                id="dataMarcacao"
+                placeholder="Selecione uma data"
+                readonly
+                disabled
+            >
+        </div>
+        
     </section>
-    <section class="calendario_marc" id="Hidden">
+    
+    <section class="calendario_marc" id="calendario">
         <div class="calendario">
             <div class="inner_calendario">
                 <div class="calendario_controlos">
