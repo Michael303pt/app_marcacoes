@@ -1,12 +1,16 @@
 /*calendario.css*/
 
 .calendario_marc{
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   font-family: "poppins", sans-serif;
   overflow: hidden;
+}
+
+.calendario_marc.ativo{
+  display: flex;
 }
 
 .calendario{

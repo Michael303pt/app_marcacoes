@@ -1,4 +1,29 @@
 //marcacoes.js
+const profissional = document.getElementById("profi");
+const inputData = document.getElementById("dataMarcacao");
+const calendario = document.getElementById("calendario");
+
+
+
+inputData.addEventListener("click", () => {
+    calendario.classList.toggle("ativo");
+});
+
+
+//input do calendario desativado até sér selecionado um profissional no dropdown
+profissional.addEventListener("change", () => {
+
+    if (profissional.value === "") {
+        inputData.disabled = true;
+        inputData.value = "";
+    } else {
+        inputData.disabled = false;
+    }
+
+});
+
+
+
 
 const dias_EL = document.querySelector(".dias");
 const btn_EL = document.querySelectorAll(".calendar_headings .fa-solid");
@@ -66,6 +91,20 @@ const mostrar_calendario = () =>{
 
     //mostra todos os dias daquele mes no calendario
     dias_EL.innerHTML = dias;
+
+
+    const diasSelecionaveis = dias_EL.querySelectorAll("li:not(.desativo)");
+
+    diasSelecionaveis.forEach((dia) => {
+        dia.addEventListener("click", () => {
+
+            const diaSelecionado = dia.textContent;
+
+            inputData.value = `${diaSelecionado}/${mes + 1}/${ano}`;
+
+            calendario.classList.remove("ativo");
+        });
+    });
 
     //mostrar mês e ano
     dias_meses_EL.innerHTML = `${dias_meses_obj.meses[mes]}, ${ano}`;
