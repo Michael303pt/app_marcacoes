@@ -8,7 +8,7 @@
     <title>Marcações</title>
     <link rel="stylesheet" href="css/marcacoes.css">
     <link rel="stylesheet" href="css/calendario.css">
-    <script src="api/marcacoes.js" defer></script>
+    <script src="js/calendario.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 </head>
 <body>
@@ -37,7 +37,7 @@
         </div>
         
     </section>
-    
+        
     <section class="calendario_marc" id="calendario">
         <div class="calendario">
             <div class="inner_calendario">
@@ -95,6 +95,25 @@
             </div>
         </div>
     </section>
-    
+
+    <section class="horarios_marc" id="horariosContainer">
+        <h3>Horários disponíveis</h3>
+        <ul class="lista_horarios" id="listaHorarios"></ul>
+    </section>
+
+    <section class="form_reserva" id="formReserva">
+        <div class="form_reserva_inner">
+            <h3>Confirmar marcação</h3>
+            <p id="resumoReserva"></p>
+            <input type="text" id="clienteNome" placeholder="O teu nome">
+            <input type="text" id="clienteContacto" placeholder="Telefone (opcional)">
+            <p class="msg_reserva" id="msgReserva"></p>
+            <div class="form_botoes">
+                <button type="button" id="btnConfirmar">Confirmar</button>
+                <button type="button" id="btnCancelar">Cancelar</button>
+            </div>
+        </div>
+    </section>
+
 </body>
 </html>
