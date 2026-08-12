@@ -103,13 +103,29 @@
 
     <section class="form_reserva" id="formReserva">
         <div class="form_reserva_inner">
-            <h3>Confirmar marcação</h3>
-            <p id="resumoReserva"></p>
-            <input type="text" id="clienteNome" placeholder="O teu nome">
-            <input type="text" id="clienteContacto" placeholder="Telefone (opcional)">
+            <h3>Marcação</h3>
+
+            <label for="servicoSelecionado">Serviço</label>
+            <select id="servicoSelecionado">
+                <option value="">A carregar serviços…</option>
+            </select>
+
+            <label for="produtoSelecionado">Produto (opcional)</label>
+            <select id="produtoSelecionado">
+                <option value="">Nenhum</option>
+            </select>
+
+            <label for="clienteNome">Nome</label>
+            <input type="text" id="clienteNome" placeholder="O teu nome" required>
+
+            <label for="clienteContacto">Telefone</label>
+            <input type="tel" id="clienteContacto" placeholder="9 dígitos" inputmode="numeric" maxlength="9" required>
+
+            <div class="resumo_final" id="resumoReserva" hidden></div>
+
             <p class="msg_reserva" id="msgReserva"></p>
             <div class="form_botoes">
-                <button type="button" id="btnConfirmar">Confirmar</button>
+                <button type="button" id="btnConfirmar" hidden>Confirmar marcação</button>
                 <button type="button" id="btnCancelar">Cancelar</button>
             </div>
         </div>

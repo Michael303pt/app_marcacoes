@@ -5,6 +5,8 @@ const calendario = document.getElementById("calendario");
 const listaHorariosEL = document.getElementById("listaHorarios");
 const horariosContainerEL = document.getElementById("horariosContainer");
 const formReservaEL = document.getElementById("formReserva");
+const servicoSelecionadoEL = document.getElementById("servicoSelecionado");
+const produtoSelecionadoEL = document.getElementById("produtoSelecionado");
 const resumoReservaEL = document.getElementById("resumoReserva");
 const clienteNomeEL = document.getElementById("clienteNome");
 const clienteContactoEL = document.getElementById("clienteContacto");
@@ -14,6 +16,11 @@ const btnCancelarEL = document.getElementById("btnCancelar");
 
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
+
+// telefone: só dígitos, no máximo 9
+clienteContactoEL.addEventListener("input", () => {
+    clienteContactoEL.value = clienteContactoEL.value.replace(/\D/g, "").slice(0, 9);
+});
 
 inputData.addEventListener("click", () => {
     calendario.classList.toggle("ativo");
@@ -183,6 +190,7 @@ function esconderHorarios() {
     listaHorariosEL.innerHTML = "";
     dataSelecionadaISO = null;
     inputData.value = "";
+    formReservaEL.classList.remove("ativo");
 }
 
 // ---------------------------------------------------------------
@@ -194,19 +202,113 @@ function abrirFormReserva(hora) {
     msgReservaEL.textContent = "";
     clienteNomeEL.value = "";
     clienteContactoEL.value = "";
-    resumoReservaEL.textContent = `${profissional.value} — ${inputData.value} às ${hora}`;
+    servicoSelecionadoEL.innerHTML = `<option value="">A carregar serviços…</option>`;
+    produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+    esconderResumo();
     formReservaEL.classList.add("ativo");
+    carregarServicos();
+    carregarProdutos();
 }
+
+async function carregarServicos() {
+    try {
+        const resposta = await fetch("/api/servicos");
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.servicos || dados.servicos.length === 0) {
+            servicoSelecionadoEL.innerHTML = `<option value="">Sem serviços disponíveis</option>`;
+            return;
+        }
+
+        servicoSelecionadoEL.innerHTML = `<option value="">Escolhe um serviço</option>`;
+        dados.servicos.forEach((servico) => {
+            const opcao = document.createElement("option");
+            opcao.value = servico.id;
+            opcao.textContent = servico.preco
+                ? `${servico.nome} — ${Number(servico.preco).toFixed(2)}€`
+                : servico.nome;
+            opcao.dataset.nome = servico.nome;
+            servicoSelecionadoEL.appendChild(opcao);
+        });
+    } catch (erro) {
+        console.error(erro);
+        servicoSelecionadoEL.innerHTML = `<option value="">Erro ao carregar serviços</option>`;
+    }
+}
+
+async function carregarProdutos() {
+    try {
+        const resposta = await fetch("/api/produtos");
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.produtos || dados.produtos.length === 0) {
+            produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+            return;
+        }
+
+        produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+        dados.produtos.forEach((produto) => {
+            const opcao = document.createElement("option");
+            opcao.value = produto.id;
+            opcao.textContent = produto.preco
+                ? `${produto.nome} — ${Number(produto.preco).toFixed(2)}€`
+                : produto.nome;
+            opcao.dataset.nome = produto.nome;
+            produtoSelecionadoEL.appendChild(opcao);
+        });
+    } catch (erro) {
+        console.error(erro);
+        produtoSelecionadoEL.innerHTML = `<option value="">Erro ao carregar produtos</option>`;
+    }
+}
+
+function formularioValido() {
+    return (
+        servicoSelecionadoEL.value !== "" &&
+        clienteNomeEL.value.trim() !== "" &&
+        /^\d{9}$/.test(clienteContactoEL.value.trim())
+    );
+}
+
+function esconderResumo() {
+    resumoReservaEL.hidden = true;
+    resumoReservaEL.innerHTML = "";
+    btnConfirmarEL.hidden = true;
+}
+
+// o resumo só aparece depois de TUDO estar preenchido corretamente — nada de popups antes disso
+function atualizarResumo() {
+    if (!formularioValido()) {
+        esconderResumo();
+        return;
+    }
+
+    const nomeServico = servicoSelecionadoEL.selectedOptions[0]?.dataset.nome;
+    const nomeProduto = produtoSelecionadoEL.selectedOptions[0]?.dataset.nome;
+
+    resumoReservaEL.innerHTML = `
+        <p><strong>Profissional:</strong> ${profissional.value}</p>
+        <p><strong>Data:</strong> ${inputData.value}</p>
+        <p><strong>Hora:</strong> ${horaSelecionada}</p>
+        <p><strong>Serviço:</strong> ${nomeServico}</p>
+        <p><strong>Produto:</strong> ${nomeProduto || "Nenhum"}</p>
+        <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
+        <p><strong>Telefone:</strong> ${clienteContactoEL.value.trim()}</p>
+    `;
+    resumoReservaEL.hidden = false;
+    btnConfirmarEL.hidden = false;
+}
+
+[servicoSelecionadoEL, produtoSelecionadoEL, clienteNomeEL, clienteContactoEL].forEach((campo) => {
+    campo.addEventListener("input", atualizarResumo);
+});
 
 btnCancelarEL.addEventListener("click", () => {
     formReservaEL.classList.remove("ativo");
 });
 
 btnConfirmarEL.addEventListener("click", async () => {
-    const nome = clienteNomeEL.value.trim();
-
-    if (!nome) {
-        msgReservaEL.textContent = "Indica o teu nome, por favor.";
+    if (!formularioValido()) {
         return;
     }
 
@@ -221,7 +323,9 @@ btnConfirmarEL.addEventListener("click", async () => {
                 profissional: profissional.value,
                 data: dataSelecionadaISO,
                 hora: horaSelecionada,
-                cliente_nome: nome,
+                servico_id: parseInt(servicoSelecionadoEL.value, 10),
+                produto_id: produtoSelecionadoEL.value ? parseInt(produtoSelecionadoEL.value, 10) : null,
+                cliente_nome: clienteNomeEL.value.trim(),
                 cliente_contacto: clienteContactoEL.value.trim(),
             }),
         });

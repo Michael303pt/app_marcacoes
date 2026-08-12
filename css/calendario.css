@@ -160,12 +160,8 @@
 
 .form_reserva{
   display: none;
-  position: fixed;
-  inset: 0;
-  align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 10;
+  padding: 0 6vw 3rem;
 }
 
 .form_reserva.ativo{
@@ -176,7 +172,7 @@
   background-color: var(--calendario-fundo);
   color: var(--calendario-font);
   width: 100%;
-  max-width: 350px;
+  max-width: 450px;
   padding: 1.5rem;
   border-radius: 5px;
   font-family: "poppins", sans-serif;
@@ -186,14 +182,44 @@
   margin-bottom: 0.5rem;
 }
 
-.form_reserva_inner input{
+.form_reserva_inner label{
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.form_reserva_inner input,
+.form_reserva_inner select{
   width: 100%;
   padding: 0.6rem;
-  margin-top: 0.6rem;
+  margin-top: 0.3rem;
   border-radius: 5px;
   border: 1px solid var(--calendario-border-bottom);
   background-color: transparent;
   color: var(--calendario-font);
+}
+
+.form_reserva_inner select option{
+  background-color: var(--calendario-fundo);
+  color: var(--calendario-font);
+}
+
+.resumo_final{
+  margin-top: 1rem;
+  padding: 0.7rem;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+}
+
+.resumo_final p{
+  margin: 0.2rem 0;
+}
+
+#btnConfirmar:disabled{
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .msg_reserva{

@@ -11,14 +11,28 @@ export default async function handler(req, res) {
         return res.status(405).json({ erro: 'Método não permitido' });
     }
 
-    const { profissional, data, hora, cliente_nome, cliente_contacto } = req.body || {};
+    const { profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto } = req.body || {};
 
-    if (!profissional || !data || !hora || !cliente_nome) {
-        return res.status(400).json({ erro: 'Faltam dados obrigatórios (profissional, data, hora, cliente_nome).' });
+    if (!profissional || !data || !hora || !servico_id || !cliente_nome || !cliente_contacto) {
+        return res.status(400).json({ erro: 'Faltam dados obrigatórios (profissional, data, hora, serviço, nome e telefone).' });
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || !/^\d{2}:\d{2}$/.test(hora)) {
         return res.status(400).json({ erro: 'Data ou hora em formato inválido.' });
+    }
+
+    if (!Number.isInteger(servico_id)) {
+        return res.status(400).json({ erro: 'Serviço inválido.' });
+    }
+
+    // produto é opcional
+    const produtoIdFinal = (produto_id === undefined || produto_id === null || produto_id === '') ? null : produto_id;
+    if (produtoIdFinal !== null && !Number.isInteger(produtoIdFinal)) {
+        return res.status(400).json({ erro: 'Produto inválido.' });
+    }
+
+    if (!/^\d{9}$/.test(cliente_contacto)) {
+        return res.status(400).json({ erro: 'O telefone deve ter exatamente 9 dígitos.' });
     }
 
     try {
@@ -34,8 +48,8 @@ export default async function handler(req, res) {
         }
 
         await sql`
-            INSERT INTO marcacoes (profissional, data, hora, cliente_nome, cliente_contacto)
-            VALUES (${profissional}, ${data}::date, ${hora}::time, ${cliente_nome}, ${cliente_contacto || null})
+            INSERT INTO marcacoes (profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto)
+            VALUES (${profissional}, ${data}::date, ${hora}::time, ${servico_id}, ${produtoIdFinal}, ${cliente_nome}, ${cliente_contacto})
         `;
 
         return res.status(201).json({ sucesso: true });

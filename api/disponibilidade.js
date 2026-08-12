@@ -7,6 +7,23 @@ import { neon } from '@neondatabase/serverless';
 
 const sql = neon(process.env.DATABASE_URL);
 
+// devolve { data: "AAAA-MM-DD", hora: "HH:MM" } correspondentes a "agora" em Lisboa,
+// para funcionar corretamente independentemente do fuso horário do servidor da Vercel.
+function agoraEmLisboa() {
+    const formatador = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Lisbon',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false,
+    });
+    const partes = formatador.formatToParts(new Date());
+    const obter = (tipo) => partes.find((p) => p.type === tipo).value;
+
+    return {
+        data: `${obter('year')}-${obter('month')}-${obter('day')}`,
+        hora: `${obter('hour')}:${obter('minute')}`,
+    };
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ erro: 'Método não permitido' });
@@ -42,9 +59,18 @@ export default async function handler(req, res) {
 
         const horasReservadas = new Set(reservados.map((linha) => linha.hora.slice(0, 5)));
 
-        const disponiveis = horariosDefinidos
+        let disponiveis = horariosDefinidos
             .map((linha) => linha.hora.slice(0, 5))
             .filter((hora) => !horasReservadas.has(hora));
+
+        // se a data escolhida for hoje, remove horários que já passaram
+        const { data: hojeISO, hora: horaAgora } = agoraEmLisboa();
+        if (data === hojeISO) {
+            disponiveis = disponiveis.filter((hora) => hora > horaAgora);
+        } else if (data < hojeISO) {
+            // segurança extra: dia já passado, não há nada disponível
+            disponiveis = [];
+        }
 
         return res.status(200).json({ horarios: disponiveis });
     } catch (erro) {
