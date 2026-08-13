@@ -1,6 +1,4 @@
-// api/produtos.js
-// GET /api/produtos
-// Devolve a lista de produtos/serviços ativos, para o cliente escolher na marcação.
+//produtos.js
 
 import { neon } from '@neondatabase/serverless';
 

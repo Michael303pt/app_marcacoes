@@ -1,6 +1,4 @@
-// api/reservar.js
-// POST /api/reservar  { profissional, data, hora, cliente_nome, cliente_contacto }
-// Cria uma marcação, se o horário ainda estiver livre.
+//reservar.js
 
 import { neon } from '@neondatabase/serverless';
 
@@ -18,7 +16,7 @@ export default async function handler(req, res) {
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || !/^\d{2}:\d{2}$/.test(hora)) {
-        return res.status(400).json({ erro: 'Data ou hora em formato inválido.' });
+        return res.status(400).json({ erro: 'Data ou hora em formato inválido. Exemplo: 2026-01-28.' });
     }
 
     if (!Number.isInteger(servico_id)) {
@@ -49,14 +47,15 @@ export default async function handler(req, res) {
 
         await sql`
             INSERT INTO marcacoes (profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto)
-            VALUES (${profissional}, ${data}::date, ${hora}::time, ${servico_id}, ${produtoIdFinal}, ${cliente_nome}, ${cliente_contacto})
+            VALUES (${profissional}, ${data}::date, ${hora}::time, ${servico_id}, ${produtoIdFinal}, 
+            ${cliente_nome}, ${cliente_contacto})
         `;
 
         return res.status(201).json({ sucesso: true });
     } catch (erro) {
         // 23505 = violação de UNIQUE (proteção extra contra corridas em simultâneo)
         if (erro && erro.code === '23505') {
-            return res.status(409).json({ erro: 'Esse horário acabou de ser reservado por outra pessoa. Escolhe outro horário.' });
+            return res.status(409).json({ erro: 'Esse horário acabou de ser reservado por outra pessoa. Escolha outro horário.' });
         }
         console.error('Erro em /api/reservar:', erro);
         return res.status(500).json({ erro: 'Não foi possível concluir a marcação.' });

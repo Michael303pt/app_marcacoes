@@ -1,15 +1,15 @@
-// api/disponibilidade.js
-// GET /api/disponibilidade?profissional=Robert%20Simon&data=2026-08-15
-// Devolve os horários desse profissional, nesse dia da semana, que ainda não
-// estão reservados nessa data.
+//disponibilidade.js
 
 import { neon } from '@neondatabase/serverless';
 
 const sql = neon(process.env.DATABASE_URL);
 
-// devolve { data: "AAAA-MM-DD", hora: "HH:MM" } correspondentes a "agora" em Lisboa,
-// para funcionar corretamente independentemente do fuso horário do servidor da Vercel.
-function agoraEmLisboa() {
+/* 
+devolve {data: "AAAA-MM-DD", hora: "HH:MM" } correspondentes à data e hora em Lisboa,
+para funcionar corretamente independentemente do fuso horário do servidor da Vercel.
+hour12: false -> sistema de horas 0 - 24.
+*/
+function HojeDataHora() {
     const formatador = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'Europe/Lisbon',
         year: 'numeric', month: '2-digit', day: '2-digit',
@@ -36,11 +36,11 @@ export default async function handler(req, res) {
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
-        return res.status(400).json({ erro: 'Formato de data inválido. Usa AAAA-MM-DD.' });
+        return res.status(400).json({ erro: 'Formato de data inválido. Exemplo: 2026-01-28.' });
     }
 
     try {
-        // horários que este profissional trabalha no dia da semana correspondente a "data"
+        //horários que um profissional trabalha, no dia da semana correspondente a "data"
         const horariosDefinidos = await sql`
             SELECT hora
             FROM horarios
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
             ORDER BY hora
         `;
 
-        // horários já reservados nesse dia exato
+        //horários reservados nesse dia
         const reservados = await sql`
             SELECT hora
             FROM marcacoes
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
             .filter((hora) => !horasReservadas.has(hora));
 
         // se a data escolhida for hoje, remove horários que já passaram
-        const { data: hojeISO, hora: horaAgora } = agoraEmLisboa();
+        const { data: hojeISO, hora: horaAgora } = HojeDataHora();
         if (data === hojeISO) {
             disponiveis = disponiveis.filter((hora) => hora > horaAgora);
         } else if (data < hojeISO) {

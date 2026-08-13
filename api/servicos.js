@@ -1,6 +1,4 @@
-// api/servicos.js
-// GET /api/servicos
-// Devolve a lista de serviços ativos (corte, barba, etc.) — escolha obrigatória na marcação.
+//servicos.js
 
 import { neon } from '@neondatabase/serverless';
 

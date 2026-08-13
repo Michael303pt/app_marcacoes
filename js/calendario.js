@@ -1,4 +1,5 @@
-// js/calendario.js
+//calendario.js
+
 const profissional = document.getElementById("profi");
 const inputData = document.getElementById("dataMarcacao");
 const calendario = document.getElementById("calendario");
@@ -58,7 +59,7 @@ let mes = date_obj.getMonth();
 let ano = date_obj.getFullYear();
 let data = date_obj.getDate();
 
-// data de hoje "limpa" (sem horas), usada para comparar dias passados
+//data de hoje (sem horas), usada para comparar dias passados
 const hoje_sem_horas = new Date();
 hoje_sem_horas.setHours(0, 0, 0, 0);
 
@@ -69,7 +70,7 @@ const mostrar_calendario = () => {
     let ultimo_data_do_ultimo_mes = new Date(ano, mes, 0).getDate();
     let dias = "";
 
-    // dias do mês anterior
+    //dias do mês anterior
     for (let x = primeiro_dia_do_mes; x > 0; x--) {
         dias += `<li class="desativo">${ultimo_data_do_ultimo_mes - x + 1}</li>`;
     }
@@ -116,7 +117,7 @@ const mostrar_calendario = () => {
 
     dias_meses_EL.innerHTML = `${dias_meses_obj.meses[mes]}, ${ano}`;
 
-    // impede recuar para meses totalmente no passado
+    //impede recuar para meses passados (não faz sentido querer marcar no passado afinal de contas xD)
     const estamos_no_mes_atual =
         mes === new Date().getMonth() && ano === new Date().getFullYear();
     btnPrevEL.classList.toggle("desativo", estamos_no_mes_atual);
@@ -124,10 +125,10 @@ const mostrar_calendario = () => {
 
 mostrar_calendario();
 
-// mês anterior/seguinte
+//btns do mês anterior/seguinte
 btn_EL.forEach((btns) => {
     btns.addEventListener("click", () => {
-        // não deixa recuar antes do mês atual
+        //não deixa recuar, antes do mês atual
         if (btns.id === "prev" && mes === new Date().getMonth() && ano === new Date().getFullYear()) {
             return;
         }
@@ -146,10 +147,7 @@ btn_EL.forEach((btns) => {
     });
 });
 
-// ---------------------------------------------------------------
-// horários disponíveis
-// ---------------------------------------------------------------
-
+//horários disponíveis
 async function carregarHorariosDisponiveis() {
     if (!profissional.value || !dataSelecionadaISO) return;
 
@@ -193,10 +191,7 @@ function esconderHorarios() {
     formReservaEL.classList.remove("ativo");
 }
 
-// ---------------------------------------------------------------
 // formulário de reserva
-// ---------------------------------------------------------------
-
 function abrirFormReserva(hora) {
     horaSelecionada = hora;
     msgReservaEL.textContent = "";
@@ -276,7 +271,7 @@ function esconderResumo() {
     btnConfirmarEL.hidden = true;
 }
 
-// o resumo só aparece depois de TUDO estar preenchido corretamente — nada de popups antes disso
+//o resumo só aparece depois de tudo estar preenchido corretamente -> nada de popups antes disto
 function atualizarResumo() {
     if (!formularioValido()) {
         esconderResumo();
