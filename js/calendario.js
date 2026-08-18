@@ -15,8 +15,11 @@ const msgReservaEL = document.getElementById("msgReserva");
 const btnConfirmarEL = document.getElementById("btnConfirmar");
 const btnCancelarEL = document.getElementById("btnCancelar");
 
+const carrinho_lista_EL = document.getElementById("lista-carrinho");
+
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
+let carrinho = {}
 
 // telefone: só dígitos, no máximo 9
 clienteContactoEL.addEventListener("input", () => {
@@ -254,6 +257,13 @@ async function carregarProdutos() {
     } catch (erro) {
         console.error(erro);
         produtoSelecionadoEL.innerHTML = `<option value="">Erro ao carregar produtos</option>`;
+    }
+}
+
+async function renderCarrinho(){
+    try{
+        
+
     }
 }
 
