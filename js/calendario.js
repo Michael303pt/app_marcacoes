@@ -15,11 +15,14 @@ const msgReservaEL = document.getElementById("msgReserva");
 const btnConfirmarEL = document.getElementById("btnConfirmar");
 const btnCancelarEL = document.getElementById("btnCancelar");
 
-const carrinho_lista_EL = document.getElementById("lista-carrinho");
+const carrinhoListaEL = document.getElementById("lista-carrinho");
 
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
-let carrinho = {}
+let carrinho = [
+    { id: 3, nome: "Shampoo", preco: 9.5, quantidade: 2 },
+    { id: 7, nome: "Cera", preco: 12, quantidade: 1 }
+];
 
 // telefone: só dígitos, no máximo 9
 clienteContactoEL.addEventListener("input", () => {
@@ -252,6 +255,7 @@ async function carregarProdutos() {
                 ? `${produto.nome} — ${Number(produto.preco).toFixed(2)}€`
                 : produto.nome;
             opcao.dataset.nome = produto.nome;
+            opcao.dataset.preco = produto.preco;
             produtoSelecionadoEL.appendChild(opcao);
         });
     } catch (erro) {
@@ -260,12 +264,38 @@ async function carregarProdutos() {
     }
 }
 
-async function renderCarrinho(){
-    try{
-        
-
+//render carrinho
+function renderCarrinho() {
+    if (carrinho.length === 0) {
+        carrinhoListaEL.hidden = true;
+        carrinhoListaEL.innerHTML = "";
+        return;
     }
+
+    carrinhoListaEL.hidden = false;
+
+    carrinhoListaEL.innerHTML = carrinho.map((item) => {
+        const subtotal = (Number(item.preco) * item.quantidade).toFixed(2);
+        if(item.quantidade > 1){
+            return `
+                <li class="item-produto" data-id="${item.id}">
+                    <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€ x${item.quantidade} = ${subtotal}€</span>
+                    <button type="button" class="btn-remover">-</button>
+                </li>
+            `;
+        }
+        else{
+            return `
+                <li class="item-produto" data-id="${item.id}">
+                    <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€</span>
+                    <button type="button" class="btn-remover">-</button>
+                </li>
+            `;
+        }
+    }).join("");
 }
+
+renderCarrinho();
 
 function formularioValido() {
     return (
