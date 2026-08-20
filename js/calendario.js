@@ -250,7 +250,7 @@ async function carregarServicos() {
             return;
         }
 
-        servicoSelecionadoEL.innerHTML = `<option value="">Escolhe um serviço</option>`;
+        servicoSelecionadoEL.innerHTML = `<option value="" hidden>Escolhe um serviço</option>`;
         dados.servicos.forEach((servico) => {
             const opcao = document.createElement("option");
             opcao.value = servico.id;
