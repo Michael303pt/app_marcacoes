@@ -308,7 +308,7 @@ function renderCarrinho() {
         if(item.quantidade > 1){
             return `
                 <li class="item-produto" data-id="${item.id}">
-                    <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€ x${item.quantidade} = ${subtotal}€</span>
+                    <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€ x ${item.quantidade} = ${subtotal}€</span>
                     <button type="button" class="btn-remover">-</button>
                 </li>
             `;
