@@ -272,7 +272,7 @@ async function carregarProdutos() {
         const dados = await resposta.json();
 
         if (!resposta.ok || !dados.produtos || dados.produtos.length === 0) {
-            produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+            produtoSelecionadoEL.innerHTML = `<option value="">Escolha um produto</option>`;
             return;
         }
 
