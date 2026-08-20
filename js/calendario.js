@@ -272,11 +272,11 @@ async function carregarProdutos() {
         const dados = await resposta.json();
 
         if (!resposta.ok || !dados.produtos || dados.produtos.length === 0) {
-            produtoSelecionadoEL.innerHTML = `<option value="">Escolha um produto</option>`;
+            produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
             return;
         }
 
-        produtoSelecionadoEL.innerHTML = `<option value="" hidden>Nenhum</option>`;
+        produtoSelecionadoEL.innerHTML = `<option value="" hidden>Escolha um produto</option>`;
         dados.produtos.forEach((produto) => {
             const opcao = document.createElement("option");
             opcao.value = produto.id;
