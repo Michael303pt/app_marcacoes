@@ -258,6 +258,7 @@ async function carregarServicos() {
                 ? `${servico.nome} — ${Number(servico.preco).toFixed(2)}€`
                 : servico.nome;
             opcao.dataset.nome = servico.nome;
+            opcao.dataset.preco = servico.preco;
             servicoSelecionadoEL.appendChild(opcao);
         });
     } catch (erro) {
