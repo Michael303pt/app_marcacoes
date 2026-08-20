@@ -19,10 +19,14 @@ const carrinhoListaEL = document.getElementById("lista-carrinho");
 
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
+let carrinho = [];
+/*
+Exemplo de carrinho
 let carrinho = [
     { id: 3, nome: "Shampoo", preco: 9.5, quantidade: 2 },
     { id: 7, nome: "Cera", preco: 12, quantidade: 1 }
 ];
+*/
 
 // telefone: só dígitos, no máximo 9
 clienteContactoEL.addEventListener("input", () => {
@@ -44,6 +48,31 @@ profissional.addEventListener("change", () => {
 
     // ao trocar de profissional, esconde qualquer lista de horários antiga
     esconderHorarios();
+});
+
+produtoSelecionadoEL.addEventListener("change", () =>{
+    if (produtoSelecionadoEL.value === ""){
+        return
+    }
+
+    let id = parseInt(produtoSelecionadoEL.value);
+    let nome = produtoSelecionadoEL.selectedOptions[0].dataset.nome;
+    let preco = Number(produtoSelecionadoEL.selectedOptions[0].dataset.preco);
+    
+    /*
+    para quando um item já existe no carrinho não duplicar, mas sim fazer quantidade +1
+    Ou seja procura no carrinho por id igual ao que foi selecionado e caso encontrado inseriu
+    na variavel igual, que por sua vez aumenta a quantidade +1
+    se não insere um novo valor no carrinho
+    */
+    produtoSelecionadoEL.value = "";
+    const igual = carrinho.find(item => item.id === id);
+    if (igual)
+        igual.quantidade++;
+    else{
+        carrinho.push({id, nome, preco, quantidade:1});
+    }
+    renderCarrinho();
 });
 
 const dias_EL = document.querySelector(".dias");
@@ -247,7 +276,7 @@ async function carregarProdutos() {
             return;
         }
 
-        produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+        produtoSelecionadoEL.innerHTML = `<option value="" hidden>Nenhum</option>`;
         dados.produtos.forEach((produto) => {
             const opcao = document.createElement("option");
             opcao.value = produto.id;
@@ -294,8 +323,6 @@ function renderCarrinho() {
         }
     }).join("");
 }
-
-renderCarrinho();
 
 function formularioValido() {
     return (
