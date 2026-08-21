@@ -72,7 +72,7 @@ produtoSelecionadoEL.addEventListener("change", () =>{
     else{
         carrinho.push({id, nome, preco, quantidade:1});
     }
-    
+
     renderCarrinho();
     atualizarResumo();
 });
@@ -341,6 +341,7 @@ carrinhoListaEL.addEventListener("click", (evento) => {
         carrinho = carrinho.filter((item) => item != remover);
 
     renderCarrinho();
+    atualizarResumo();
 });
 
 function formularioValido() {
