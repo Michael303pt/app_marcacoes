@@ -254,7 +254,7 @@
 }
 
 .btnRemover {
-  background-color: #dc3545;
+  background-color: rgb(180, 4, 4);
   color: #ffffff;
   padding: 10px 16px;
   border: none;
@@ -264,6 +264,6 @@
 }
 
 .btnRemover:hover{
-  background-color: #ffffff;
-  color: #dc3545;
+  background-color: rgb(255, 49, 49);
+  color: #ffffff;
 }
