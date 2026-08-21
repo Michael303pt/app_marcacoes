@@ -325,6 +325,22 @@ function renderCarrinho() {
     }).join("");
 }
 
+carrinhoListaEL.addEventListener("click", (evento) => {
+    const botao = evento.target.closest(".btn-remover");
+    if (!botao) return;
+
+    const li = botao.closest(".item-produto");
+    const id = parseInt(li.dataset.id);
+
+    const remover = carrinho.find(item => item.id === id);
+    if (remover.quantidade>1)
+        remover.quantidade--;
+    else
+        carrinho = carrinho.filter((item) => item != remover);
+
+    renderCarrinho();
+});
+
 function formularioValido() {
     return (
         servicoSelecionadoEL.value !== "" &&
