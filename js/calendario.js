@@ -363,14 +363,30 @@ function atualizarResumo() {
     }
 
     const nomeServico = servicoSelecionadoEL.selectedOptions[0]?.dataset.nome;
-    const nomeProduto = produtoSelecionadoEL.selectedOptions[0]?.dataset.nome;
+    const precoServico = Number(servicoSelecionadoEL.selectedOptions[0]?.dataset.preco) || 0;
+    
+    const produtos = carrinho.map((item) => {
+        if(item.quantidade > 1)
+            return `${item.nome} — ${Number(item.preco).toFixed(2)}€ x ${item.quantidade}`;
+        else
+            return `${item.nome} — ${Number(item.preco).toFixed(2)}€`;
+    }).join("<br>");
+
+    const totalProdutos = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+    /*
+    soma — é o valor acumulado até agora. É como uma "mochila" que vai sendo 
+        preenchida de volta em volta, cada vez um bocadinho mais pesada.
+    item — é o elemento actual do array, exactamente como no map/forEach.
+    */
+    const total = (precoServico + totalProdutos).toFixed(2);
 
     resumoReservaEL.innerHTML = `
         <p><strong>Profissional:</strong> ${profissional.value}</p>
         <p><strong>Data:</strong> ${inputData.value}</p>
         <p><strong>Hora:</strong> ${horaSelecionada}</p>
         <p><strong>Serviço:</strong> ${nomeServico}</p>
-        <p><strong>Produto:</strong> ${nomeProduto || "Nenhum"}</p>
+        <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
+        <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
         <p><strong>Telefone:</strong> ${clienteContactoEL.value.trim()}</p>
     `;
