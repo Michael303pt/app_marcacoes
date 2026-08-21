@@ -19,10 +19,14 @@ const carrinhoListaEL = document.getElementById("lista-carrinho");
 
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
+let carrinho = [];
+/*
+Exemplo de carrinho
 let carrinho = [
     { id: 3, nome: "Shampoo", preco: 9.5, quantidade: 2 },
     { id: 7, nome: "Cera", preco: 12, quantidade: 1 }
 ];
+*/
 
 // telefone: só dígitos, no máximo 9
 clienteContactoEL.addEventListener("input", () => {
@@ -44,6 +48,33 @@ profissional.addEventListener("change", () => {
 
     // ao trocar de profissional, esconde qualquer lista de horários antiga
     esconderHorarios();
+});
+
+produtoSelecionadoEL.addEventListener("change", () =>{
+    if (produtoSelecionadoEL.value === ""){
+        return
+    }
+
+    let id = parseInt(produtoSelecionadoEL.value);
+    let nome = produtoSelecionadoEL.selectedOptions[0].dataset.nome;
+    let preco = Number(produtoSelecionadoEL.selectedOptions[0].dataset.preco);
+    
+    /*
+    para quando um item já existe no carrinho não duplicar, mas sim fazer quantidade +1
+    Ou seja procura no carrinho por id igual ao que foi selecionado e caso encontrado inseriu
+    na variavel igual, que por sua vez aumenta a quantidade +1
+    se não insere um novo valor no carrinho
+    */
+    produtoSelecionadoEL.value = "";
+    const igual = carrinho.find(item => item.id === id);
+    if (igual)
+        igual.quantidade++;
+    else{
+        carrinho.push({id, nome, preco, quantidade:1});
+    }
+
+    renderCarrinho();
+    atualizarResumo();
 });
 
 const dias_EL = document.querySelector(".dias");
@@ -221,7 +252,7 @@ async function carregarServicos() {
             return;
         }
 
-        servicoSelecionadoEL.innerHTML = `<option value="">Escolhe um serviço</option>`;
+        servicoSelecionadoEL.innerHTML = `<option value="" hidden>Escolhe um serviço</option>`;
         dados.servicos.forEach((servico) => {
             const opcao = document.createElement("option");
             opcao.value = servico.id;
@@ -229,6 +260,7 @@ async function carregarServicos() {
                 ? `${servico.nome} — ${Number(servico.preco).toFixed(2)}€`
                 : servico.nome;
             opcao.dataset.nome = servico.nome;
+            opcao.dataset.preco = servico.preco;
             servicoSelecionadoEL.appendChild(opcao);
         });
     } catch (erro) {
@@ -247,7 +279,7 @@ async function carregarProdutos() {
             return;
         }
 
-        produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+        produtoSelecionadoEL.innerHTML = `<option value="" hidden>Escolha um produto</option>`;
         dados.produtos.forEach((produto) => {
             const opcao = document.createElement("option");
             opcao.value = produto.id;
@@ -279,8 +311,8 @@ function renderCarrinho() {
         if(item.quantidade > 1){
             return `
                 <li class="item-produto" data-id="${item.id}">
-                    <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€ x${item.quantidade} = ${subtotal}€</span>
-                    <button type="button" class="btn-remover">-</button>
+                    <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€ x ${item.quantidade} = ${subtotal}€</span>
+                    <button type="button" class="btnRemover">-</button>
                 </li>
             `;
         }
@@ -288,14 +320,29 @@ function renderCarrinho() {
             return `
                 <li class="item-produto" data-id="${item.id}">
                     <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€</span>
-                    <button type="button" class="btn-remover">-</button>
+                    <button type="button" class="btnRemover">-</button>
                 </li>
             `;
         }
     }).join("");
 }
 
-renderCarrinho();
+carrinhoListaEL.addEventListener("click", (evento) => {
+    const botao = evento.target.closest(".btnRemover");
+    if (!botao) return;
+
+    const li = botao.closest(".item-produto");
+    const id = parseInt(li.dataset.id);
+
+    const remover = carrinho.find(item => item.id === id);
+    if (remover.quantidade>1)
+        remover.quantidade--;
+    else
+        carrinho = carrinho.filter((item) => item != remover);
+
+    renderCarrinho();
+    atualizarResumo();
+});
 
 function formularioValido() {
     return (
@@ -319,14 +366,30 @@ function atualizarResumo() {
     }
 
     const nomeServico = servicoSelecionadoEL.selectedOptions[0]?.dataset.nome;
-    const nomeProduto = produtoSelecionadoEL.selectedOptions[0]?.dataset.nome;
+    const precoServico = Number(servicoSelecionadoEL.selectedOptions[0]?.dataset.preco) || 0;
+
+    const produtos = carrinho.map((item) => {
+        if(item.quantidade > 1)
+            return `${item.nome} — ${Number(item.preco).toFixed(2)}€ x ${item.quantidade}`;
+        else
+            return `${item.nome} — ${Number(item.preco).toFixed(2)}€`;
+    }).join("<br>");
+
+    const totalProdutos = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+    /*
+    soma — é o valor acumulado até agora. É como uma "mochila" que vai sendo 
+        preenchida de volta em volta, cada vez um bocadinho mais pesada.
+    item — é o elemento actual do array, exactamente como no map/forEach.
+    */
+    const total = (precoServico + totalProdutos).toFixed(2);
 
     resumoReservaEL.innerHTML = `
         <p><strong>Profissional:</strong> ${profissional.value}</p>
         <p><strong>Data:</strong> ${inputData.value}</p>
         <p><strong>Hora:</strong> ${horaSelecionada}</p>
         <p><strong>Serviço:</strong> ${nomeServico}</p>
-        <p><strong>Produto:</strong> ${nomeProduto || "Nenhum"}</p>
+        <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
+        <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
         <p><strong>Telefone:</strong> ${clienteContactoEL.value.trim()}</p>
     `;
