@@ -252,3 +252,18 @@
   background-color: var(--calendario-desativo);
   color: white;
 }
+
+.btnRemover {
+  background-color: #dc3545;
+  color: #ffffff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btnRemover:hover{
+  background-color: #ffffff;
+  color: #dc3545;
+}

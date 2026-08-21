@@ -310,7 +310,7 @@ function renderCarrinho() {
             return `
                 <li class="item-produto" data-id="${item.id}">
                     <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€ x ${item.quantidade} = ${subtotal}€</span>
-                    <button type="button" class="btn-remover">-</button>
+                    <button type="button" class="btnRemover">-</button>
                 </li>
             `;
         }
@@ -318,7 +318,7 @@ function renderCarrinho() {
             return `
                 <li class="item-produto" data-id="${item.id}">
                     <span class="nome-produto">${item.nome} — ${Number(item.preco).toFixed(2)}€</span>
-                    <button type="button" class="btn-remover">-</button>
+                    <button type="button" class="btnRemover">-</button>
                 </li>
             `;
         }
@@ -326,7 +326,7 @@ function renderCarrinho() {
 }
 
 carrinhoListaEL.addEventListener("click", (evento) => {
-    const botao = evento.target.closest(".btn-remover");
+    const botao = evento.target.closest(".btnRemover");
     if (!botao) return;
 
     const li = botao.closest(".item-produto");
