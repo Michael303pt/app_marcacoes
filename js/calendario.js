@@ -72,7 +72,9 @@ produtoSelecionadoEL.addEventListener("change", () =>{
     else{
         carrinho.push({id, nome, preco, quantidade:1});
     }
+    
     renderCarrinho();
+    atualizarResumo();
 });
 
 const dias_EL = document.querySelector(".dias");
@@ -364,7 +366,7 @@ function atualizarResumo() {
 
     const nomeServico = servicoSelecionadoEL.selectedOptions[0]?.dataset.nome;
     const precoServico = Number(servicoSelecionadoEL.selectedOptions[0]?.dataset.preco) || 0;
-    
+
     const produtos = carrinho.map((item) => {
         if(item.quantidade > 1)
             return `${item.nome} — ${Number(item.preco).toFixed(2)}€ x ${item.quantidade}`;
