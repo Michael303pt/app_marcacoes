@@ -1,41 +1,62 @@
 <!-- marcacoes.html -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marcações</title>
+    <title>Marcações · Olimpo Barbershop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <link rel="stylesheet" href="css/marcacoes.css">
     <link rel="stylesheet" href="css/calendario.css">
     <script src="js/calendario.js" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 </head>
 <body>
     <header>
     <nav class="wrap">
         <a href="barbershop.html" class="logo">Olimpo  <span>Barbershop</span></a>
+        <a href="barbershop.html" class="back-link"><i class="fa-solid fa-arrow-left-long"></i> Voltar</a>
     </nav>
     </header>
-    <section class="DropDown profissional">
-        <select name="Profissional" id="profi">
-            <option value="" disabled selected hidden>escolha o profissional</option>
-            <option value="Robert Simon">Robert Simon</option>
-            <option value="Yes1">Yes1</option>
-            <option value="Yes2">Yes2</option>
-            <option value="Yes3">Yes3</option>
-        </select>
 
-        <div class="campo-data">
-            <input
-                type="text"
-                id="dataMarcacao"
-                placeholder="Selecione uma data"
-                readonly
-                disabled
-            >
+    <section class="marc-intro">
+        <div class="wrap">
+            <div class="eyebrow">Reserve o seu horário</div>
+            <h1>Marcações</h1>
+            <p class="lead">Escolha o profissional, a data e o serviço. Simples, rápido, sem filas.</p>
         </div>
-        
+    </section>
+
+    <section class="DropDown profissional">
+        <div class="profissional_inner">
+            <div class="campo-grupo">
+                <label for="profi">Profissional</label>
+                <select name="Profissional" id="profi">
+                    <option value="" disabled selected hidden>escolha o profissional</option>
+                    <option value="Robert Simon">Robert Simon</option>
+                    <option value="Yes1">Yes1</option>
+                    <option value="Yes2">Yes2</option>
+                    <option value="Yes3">Yes3</option>
+                </select>
+            </div>
+
+            <div class="campo-grupo campo-data">
+                <label for="dataMarcacao">Data</label>
+                <div class="campo-data_input">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <input
+                        type="text"
+                        id="dataMarcacao"
+                        placeholder="Selecione uma data"
+                        readonly
+                        disabled
+                    >
+                </div>
+            </div>
+        </div>
     </section>
         
     <section class="calendario_marc" id="calendario">
