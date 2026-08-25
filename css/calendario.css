@@ -1,21 +1,26 @@
 /*calendario.css*/
 
-@keyframes fadeInUp{
-  from{ opacity:0; transform:translateY(10px); }
-  to{ opacity:1; transform:translateY(0); }
-}
-
 .calendario_marc{
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6vw 3rem;
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 6vw;
   font-family: "Work Sans", sans-serif;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
 }
 
 .calendario_marc.ativo{
-  display: flex;
-  animation: fadeInUp .25s ease;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  padding: 1.4rem 6vw 3rem;
+}
+
+.calendario_marc > .calendario{
+  min-height: 0;
 }
 
 .calendario{
@@ -122,6 +127,13 @@
   font-weight: 500;
 }
 
+.data .dias li.selecionado{
+  background-color: var(--gold, #b08d57);
+  color: var(--calendario-fundo);
+  font-weight: 600;
+  box-shadow: 0 0 0 2px var(--gold-light, #d9b787);
+}
+
 .data .desativo{
   color: var(--calendario-desativo);
 }
@@ -145,14 +157,29 @@
 /* ---------- lista de horários disponíveis ---------- */
 
 .horarios_marc{
-  display: none;
-  justify-content: center;
-  padding: 0 6vw 3rem;
-  animation: fadeInUp .25s ease;
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 6vw;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
 }
 
 .horarios_marc.ativo{
+  grid-template-rows: 1fr;
+  opacity: 1;
+  padding: 1.4rem 6vw 3rem;
+}
+
+.horarios_marc > .horarios_inner{
+  min-height: 0;
+  width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .horarios_marc h3{
@@ -215,14 +242,25 @@
 /* ---------- formulário de confirmação de marcação ---------- */
 
 .form_reserva{
-  display: none;
-  justify-content: center;
-  padding: 0 6vw 3.5rem;
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 6vw;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
 }
 
 .form_reserva.ativo{
-  display: flex;
-  animation: fadeInUp .25s ease;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  padding: 1.4rem 6vw 3.5rem;
+}
+
+.form_reserva > .form_reserva_inner{
+  min-height: 0;
 }
 
 .form_reserva_inner{
@@ -322,6 +360,25 @@
   background-color: rgba(176, 141, 87, 0.08);
   border: 1px solid rgba(176, 141, 87, 0.25);
   font-size: 0.88rem;
+}
+
+.resumo_datahora{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px dashed rgba(176, 141, 87, 0.35);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-light, #d9b787);
+}
+
+.resumo_datahora i{
+  color: var(--gold, #b08d57);
+  margin-right: 0.4rem;
 }
 
 .resumo_final p{

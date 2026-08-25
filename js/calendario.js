@@ -19,6 +19,7 @@ const carrinhoListaEL = document.getElementById("lista-carrinho");
 
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
+let dataSelecionada = null; // { dia, mes, ano } do dia clicado no calendário
 let carrinho = [];
 /*
 Exemplo de carrinho
@@ -143,6 +144,9 @@ const mostrar_calendario = () => {
         dia.addEventListener("click", () => {
             const diaSelecionado = parseInt(dia.textContent, 10);
 
+            dataSelecionada = { dia: diaSelecionado, mes, ano };
+            marcarDiaSelecionado();
+
             inputData.value = `${diaSelecionado}/${mes + 1}/${ano}`;
             dataSelecionadaISO = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(diaSelecionado).padStart(2, "0")}`;
 
@@ -152,6 +156,9 @@ const mostrar_calendario = () => {
         });
     });
 
+    // se já houver uma data escolhida e estivermos a ver o mesmo mês/ano, mantém o dia marcado
+    marcarDiaSelecionado();
+
     dias_meses_EL.innerHTML = `${dias_meses_obj.meses[mes]}, ${ano}`;
 
     //impede recuar para meses passados (não faz sentido querer marcar no passado afinal de contas xD)
@@ -159,6 +166,20 @@ const mostrar_calendario = () => {
         mes === new Date().getMonth() && ano === new Date().getFullYear();
     btnPrevEL.classList.toggle("desativo", estamos_no_mes_atual);
 };
+
+// marca visualmente (classe "selecionado") o dia escolhido pelo utilizador, se pertencer ao mês visível
+function marcarDiaSelecionado() {
+    dias_EL.querySelectorAll("li.selecionado").forEach((el) => el.classList.remove("selecionado"));
+
+    if (!dataSelecionada || dataSelecionada.mes !== mes || dataSelecionada.ano !== ano) {
+        return;
+    }
+
+    const alvo = [...dias_EL.querySelectorAll("li:not(.desativo)")].find(
+        (li) => parseInt(li.textContent, 10) === dataSelecionada.dia
+    );
+    if (alvo) alvo.classList.add("selecionado");
+}
 
 mostrar_calendario();
 
@@ -190,6 +211,11 @@ async function carregarHorariosDisponiveis() {
 
     horariosContainerEL.classList.add("ativo");
     listaHorariosEL.innerHTML = `<li class="a_carregar">A carregar horários…</li>`;
+
+    // dá um pequeno "slide" até à próxima secção, já com a animação de abertura a decorrer
+    setTimeout(() => {
+        horariosContainerEL.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
 
     try {
         const url = `/api/disponibilidade?profissional=${encodeURIComponent(profissional.value)}&data=${dataSelecionadaISO}`;
@@ -224,6 +250,8 @@ function esconderHorarios() {
     horariosContainerEL.classList.remove("ativo");
     listaHorariosEL.innerHTML = "";
     dataSelecionadaISO = null;
+    dataSelecionada = null;
+    marcarDiaSelecionado();
     inputData.value = "";
     formReservaEL.classList.remove("ativo");
 }
@@ -240,6 +268,10 @@ function abrirFormReserva(hora) {
     formReservaEL.classList.add("ativo");
     carregarServicos();
     carregarProdutos();
+
+    setTimeout(() => {
+        formReservaEL.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
 }
 
 async function carregarServicos() {
@@ -365,6 +397,8 @@ function atualizarResumo() {
         return;
     }
 
+    const resumoJaVisivel = !resumoReservaEL.hidden;
+
     const nomeServico = servicoSelecionadoEL.selectedOptions[0]?.dataset.nome;
     const precoServico = Number(servicoSelecionadoEL.selectedOptions[0]?.dataset.preco) || 0;
 
@@ -384,9 +418,11 @@ function atualizarResumo() {
     const total = (precoServico + totalProdutos).toFixed(2);
 
     resumoReservaEL.innerHTML = `
+        <div class="resumo_datahora">
+            <span><i class="fa-solid fa-calendar-days"></i>${inputData.value}</span>
+            <span><i class="fa-solid fa-clock"></i>${horaSelecionada}</span>
+        </div>
         <p><strong>Profissional:</strong> ${profissional.value}</p>
-        <p><strong>Data:</strong> ${inputData.value}</p>
-        <p><strong>Hora:</strong> ${horaSelecionada}</p>
         <p><strong>Serviço:</strong> ${nomeServico}</p>
         <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
         <p><strong>Total:</strong> ${total}€</p>
@@ -395,6 +431,13 @@ function atualizarResumo() {
     `;
     resumoReservaEL.hidden = false;
     btnConfirmarEL.hidden = false;
+
+    // na primeira vez que o resumo aparece, desliza suavemente até ele
+    if (!resumoJaVisivel) {
+        setTimeout(() => {
+            resumoReservaEL.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+    }
 }
 
 [servicoSelecionadoEL, produtoSelecionadoEL, clienteNomeEL, clienteContactoEL].forEach((campo) => {
