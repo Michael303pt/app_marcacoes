@@ -224,6 +224,12 @@
   color: var(--calendario-fundo);
 }
 
+.horario_item .selecionado{
+  background-color: var(--gold, #b08d57);
+  border-color: var(--gold, #b08d57);
+  color: var(--calendario-fundo);
+}
+
 .lista_horarios .a_carregar,
 .lista_horarios .erro,
 .lista_horarios .vazio{

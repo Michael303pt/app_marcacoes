@@ -237,7 +237,7 @@ async function carregarHorariosDisponiveis() {
             const item = document.createElement("li");
             item.className = "horario_item";
             item.textContent = hora;
-            item.addEventListener("click", () => abrirFormReserva(hora));
+            item.addEventListener("click", () => abrirFormReserva(hora, item));
             listaHorariosEL.appendChild(item);
         });
     } catch (erro) {
@@ -257,7 +257,12 @@ function esconderHorarios() {
 }
 
 // formulário de reserva
-function abrirFormReserva(hora) {
+function abrirFormReserva(hora, elementoSelecionado) {
+    listaHorariosEL.querySelectorAll(".horario_item.selecionado").forEach((el) => {
+        el.classList.remove("selecionado");
+    });
+    elementoSelecionado.classList.add("selecionado");
+
     horaSelecionada = hora;
     msgReservaEL.textContent = "";
     clienteNomeEL.value = "";
