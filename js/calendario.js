@@ -153,6 +153,8 @@ const mostrar_calendario = () => {
 
             calendario.classList.remove("ativo");
 
+            
+            
             carregarHorariosDisponiveis();
         });
     });
@@ -166,6 +168,8 @@ const mostrar_calendario = () => {
     const estamos_no_mes_atual =
         mes === new Date().getMonth() && ano === new Date().getFullYear();
     btnPrevEL.classList.toggle("desativo", estamos_no_mes_atual);
+
+    
 };
 
 // marca visualmente (classe "selecionado") o dia escolhido pelo utilizador, se pertencer ao mês visível
@@ -210,6 +214,7 @@ btn_EL.forEach((btns) => {
 async function carregarHorariosDisponiveis() {
     if (!profissional.value || !dataSelecionadaISO) return;
 
+    formReservaEL.classList.remove("ativo");
     horariosContainerEL.classList.add("ativo");
     listaHorariosEL.innerHTML = `<li class="a_carregar">A carregar horários…</li>`;
 

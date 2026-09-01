@@ -8,7 +8,10 @@
 // Podes também testar isto manualmente (fora do horário do cron) fazendo
 // um pedido GET à rota com o cabeçalho Authorization correto — ver README.
 
-import { sql } from "../../lib/db.js";
+import { neon } from '@neondatabase/serverless';
+
+const sql = neon(process.env.DATABASE_URL);
+
 import { enviarEmail } from "../../lib/email.js";
 import crypto from "node:crypto";
 
@@ -37,7 +40,7 @@ export default async function handler(req, res) {
       WHERE m.status = 'agendada'
         AND m.lembrete_enviado_em IS NULL
         AND m.cliente_email IS NOT NULL
-        AND m.data = (CURRENT_DATE + INTERVAL '3 days')::date
+        AND m.data BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '3 days')::date
     `;
 
     const baseUrl = process.env.SITE_URL || `https://${req.headers.host}`;
