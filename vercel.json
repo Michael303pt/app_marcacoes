@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/lembrete-marcacoes",
-      "schedule": "53 15 * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
