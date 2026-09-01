@@ -9,10 +9,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ erro: 'Método não permitido' });
     }
 
-    const { profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto } = req.body || {};
+    const { profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto, cliente_email } = req.body || {};
 
-    if (!profissional || !data || !hora || !servico_id || !cliente_nome || !cliente_contacto) {
-        return res.status(400).json({ erro: 'Faltam dados obrigatórios (profissional, data, hora, serviço, nome e telefone).' });
+    if (!profissional || !data || !hora || !servico_id || !cliente_nome || !cliente_contacto || !cliente_email) {
+        return res.status(400).json({ erro: 'Faltam dados obrigatórios (profissional, data, hora, serviço, nome, telefone e email).' });
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || !/^\d{2}:\d{2}$/.test(hora)) {
@@ -33,12 +33,18 @@ export default async function handler(req, res) {
         return res.status(400).json({ erro: 'O telefone deve ter exatamente 9 dígitos.' });
     }
 
+    const clienteEmailFinal = String(cliente_email).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmailFinal)) {
+        return res.status(400).json({ erro: 'O email introduzido não é válido.' });
+    }
+
     try {
         const jaExiste = await sql`
             SELECT id FROM marcacoes
             WHERE profissional = ${profissional}
               AND data = ${data}::date
               AND hora = ${hora}::time
+              AND status != 'cancelada'
         `;
 
         if (jaExiste.length > 0) {
@@ -46,9 +52,9 @@ export default async function handler(req, res) {
         }
 
         await sql`
-            INSERT INTO marcacoes (profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto)
+            INSERT INTO marcacoes (profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto, cliente_email)
             VALUES (${profissional}, ${data}::date, ${hora}::time, ${servico_id}, ${produtoIdFinal}, 
-            ${cliente_nome}, ${cliente_contacto})
+            ${cliente_nome}, ${cliente_contacto}, ${clienteEmailFinal})
         `;
 
         return res.status(201).json({ sucesso: true });

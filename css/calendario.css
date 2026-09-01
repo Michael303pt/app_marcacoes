@@ -322,6 +322,13 @@
   color: var(--muted, #a89a8c);
 }
 
+.campo-nota{
+  margin-top: 0.4rem;
+  font-size: 0.76rem;
+  color: var(--muted, #a89a8c);
+  line-height: 1.4;
+}
+
 .form_reserva_inner input:hover,
 .form_reserva_inner input:focus,
 .form_reserva_inner select:hover,

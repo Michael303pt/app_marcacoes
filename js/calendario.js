@@ -11,6 +11,7 @@ const produtoSelecionadoEL = document.getElementById("produtoSelecionado");
 const resumoReservaEL = document.getElementById("resumoReserva");
 const clienteNomeEL = document.getElementById("clienteNome");
 const clienteContactoEL = document.getElementById("clienteContacto");
+const clienteEmailEL = document.getElementById("clienteEmail");
 const msgReservaEL = document.getElementById("msgReserva");
 const btnConfirmarEL = document.getElementById("btnConfirmar");
 const btnCancelarEL = document.getElementById("btnCancelar");
@@ -267,6 +268,7 @@ function abrirFormReserva(hora, elementoSelecionado) {
     msgReservaEL.textContent = "";
     clienteNomeEL.value = "";
     clienteContactoEL.value = "";
+    clienteEmailEL.value = "";
     servicoSelecionadoEL.innerHTML = `<option value="">A carregar serviços…</option>`;
     produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
     esconderResumo();
@@ -385,7 +387,8 @@ function formularioValido() {
     return (
         servicoSelecionadoEL.value !== "" &&
         clienteNomeEL.value.trim() !== "" &&
-        /^\d{9}$/.test(clienteContactoEL.value.trim())
+        /^\d{9}$/.test(clienteContactoEL.value.trim()) &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmailEL.value.trim())
     );
 }
 
@@ -433,6 +436,7 @@ function atualizarResumo() {
         <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
         <p><strong>Telefone:</strong> ${clienteContactoEL.value.trim()}</p>
+        <p><strong>Email:</strong> ${clienteEmailEL.value.trim()}</p>
     `;
     resumoReservaEL.hidden = false;
     btnConfirmarEL.hidden = false;
@@ -445,7 +449,7 @@ function atualizarResumo() {
     }
 }
 
-[servicoSelecionadoEL, produtoSelecionadoEL, clienteNomeEL, clienteContactoEL].forEach((campo) => {
+[servicoSelecionadoEL, produtoSelecionadoEL, clienteNomeEL, clienteContactoEL, clienteEmailEL].forEach((campo) => {
     campo.addEventListener("input", atualizarResumo);
 });
 
@@ -473,6 +477,7 @@ btnConfirmarEL.addEventListener("click", async () => {
                 produto_id: produtoSelecionadoEL.value ? parseInt(produtoSelecionadoEL.value, 10) : null,
                 cliente_nome: clienteNomeEL.value.trim(),
                 cliente_contacto: clienteContactoEL.value.trim(),
+                cliente_email: clienteEmailEL.value.trim().toLowerCase(),
             }),
         });
 
