@@ -1,43 +1,81 @@
 /*calendario.css*/
 
 .calendario_marc{
-  display: none;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  font-family: "poppins", sans-serif;
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
   overflow: hidden;
+  padding: 0 6vw;
+  font-family: "Work Sans", sans-serif;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
 }
 
 .calendario_marc.ativo{
-  display: flex;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  padding: 1.4rem 6vw 3rem;
+}
+
+.calendario_marc > .calendario{
+  min-height: 0;
 }
 
 .calendario{
   background-color: var(--calendario-fundo);
   color: var(--calendario-font);
-  border-radius: 5px;
+  border-radius: 8px;
+  border: 1px solid var(--line, rgba(237,230,218,0.12));
   max-width: 450px;
   width: 100%;
-  box-shadow: 5px px 10px var(--calendario-fundo);
-  height: 465px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .inner_calendario{
-  padding: 2rem;
+  padding: 1.6rem 1.7rem 1.8rem;
+}
+
+.calendario_controlos{
+  border-bottom: 1px solid var(--calendario-border-bottom);
+  padding-bottom: 1rem;
 }
 
 .calendar_headings{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0;
+  padding: .3rem 0;
+}
+
+.month_year{
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: 1.05rem;
+  color: var(--gold, #b08d57);
 }
 
 .fa-solid.fa-arrow-right,
 .fa-solid.fa-arrow-left{
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1rem;
+  color: var(--calendario-font);
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.fa-solid.fa-arrow-right:hover,
+.fa-solid.fa-arrow-left:hover{
+  background-color: var(--gold, #b08d57);
+  color: var(--calendario-fundo);
 }
 
 .data ul{
@@ -45,7 +83,7 @@
 }
 
 .data{
-  margin-top: 1rem;
+  margin-top: 1.1rem;
 }
 
 .data .dias_semana, .dias{
@@ -55,28 +93,45 @@
 }
 
 .data .dias_semana li{
-  border-bottom: 2px solid var(--calendario-border-bottom);
-  margin: 0 0.2rem;
+  border-bottom: 1px solid var(--calendario-border-bottom);
+  margin: 0 0.15rem 0.6rem;
+  padding-bottom: .5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted, #a89a8c);
 }
 
 .data li{
   padding: 0.5rem;
-  margin: 0.2rem;
+  margin: 0.15rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border-radius: 5px;
   color: var(--calendario-font);
+  font-size: .88rem;
+  transition: background-color .15s ease, color .15s ease;
 }
 
 .data .dias li:hover{
-  background-color: var(--calendario-hover);
+  background-color: var(--gold, #b08d57);
   color: var(--calendario-fundo);
 }
 
 .data .dias li.hoje{
   background: var(--calendario-hoje);
+  color: var(--cream, #ede6da);
+  font-weight: 500;
+}
+
+.data .dias li.selecionado{
+  background-color: var(--gold, #b08d57);
+  color: var(--calendario-fundo);
+  font-weight: 600;
+  box-shadow: 0 0 0 2px var(--gold-light, #d9b787);
 }
 
 .data .desativo{
@@ -85,7 +140,7 @@
 
 .data li.desativo:hover{
   color: var(--calendario-desativo);
-  background-color: var(--calendario-fundo);
+  background-color: transparent;
 }
 
 .data li.desativo,
@@ -102,20 +157,43 @@
 /* ---------- lista de horários disponíveis ---------- */
 
 .horarios_marc{
-  display: none;
-  justify-content: center;
-  padding: 1.5rem 6vw 3rem;
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 6vw;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
 }
 
 .horarios_marc.ativo{
+  grid-template-rows: 1fr;
+  opacity: 1;
+  padding: 1.4rem 6vw 3rem;
+}
+
+.horarios_marc > .horarios_inner{
+  min-height: 0;
+  width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .horarios_marc h3{
   width: 100%;
   max-width: 450px;
-  margin-bottom: 0.8rem;
-  font-family: "poppins", sans-serif;
+  margin-bottom: 1rem;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: 1rem;
+  color: var(--gold, #b08d57);
+  padding-bottom: .7rem;
+  border-bottom: 1px solid var(--line, rgba(237,230,218,0.12));
 }
 
 .lista_horarios{
@@ -131,14 +209,24 @@
   background-color: var(--calendario-fundo);
   color: var(--calendario-font);
   text-align: center;
-  padding: 0.6rem 0.3rem;
+  padding: 0.65rem 0.3rem;
   border-radius: 5px;
+  border: 1px solid var(--line, rgba(237,230,218,0.12));
   cursor: pointer;
-  font-family: "poppins", sans-serif;
+  font-family: 'Space Mono', monospace;
+  font-size: .85rem;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
 }
 
 .horario_item:hover{
-  background-color: var(--calendario-hover);
+  background-color: var(--gold, #b08d57);
+  border-color: var(--gold, #b08d57);
+  color: var(--calendario-fundo);
+}
+
+.horario_item.selecionado{
+  background-color: var(--gold, #b08d57);
+  border-color: var(--gold, #b08d57);
   color: var(--calendario-fundo);
 }
 
@@ -147,25 +235,38 @@
 .lista_horarios .vazio{
   grid-column: 1 / -1;
   text-align: center;
-  padding: 0.6rem;
+  padding: 0.8rem;
   cursor: default;
-  font-family: "poppins", sans-serif;
+  font-family: 'Work Sans', sans-serif;
+  color: var(--muted, #a89a8c);
 }
 
 .lista_horarios .erro{
-  color: #e05252;
+  color: #e0736f;
 }
 
 /* ---------- formulário de confirmação de marcação ---------- */
 
 .form_reserva{
-  display: none;
-  justify-content: center;
-  padding: 0 6vw 3rem;
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 6vw;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
 }
 
 .form_reserva.ativo{
-  display: flex;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  padding: 1.4rem 6vw 3.5rem;
+}
+
+.form_reserva > .form_reserva_inner{
+  min-height: 0;
 }
 
 .form_reserva_inner{
@@ -173,31 +274,60 @@
   color: var(--calendario-font);
   width: 100%;
   max-width: 450px;
-  padding: 1.5rem;
-  border-radius: 5px;
-  font-family: "poppins", sans-serif;
+  padding: 1.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--line, rgba(237,230,218,0.12));
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-family: 'Work Sans', sans-serif;
 }
 
 .form_reserva_inner h3{
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: 1.1rem;
+  color: var(--gold, #b08d57);
+  padding-bottom: .8rem;
+  border-bottom: 1px solid var(--line, rgba(237,230,218,0.12));
 }
 
 .form_reserva_inner label{
   display: block;
-  margin-top: 0.7rem;
-  font-size: 0.85rem;
-  opacity: 0.8;
+  margin-top: 0.9rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--gold, #b08d57);
+  opacity: .9;
 }
 
 .form_reserva_inner input,
 .form_reserva_inner select{
   width: 100%;
-  padding: 0.6rem;
-  margin-top: 0.3rem;
+  padding: 0.65rem 0.8rem;
+  margin-top: 0.4rem;
   border-radius: 5px;
   border: 1px solid var(--calendario-border-bottom);
-  background-color: transparent;
+  background-color: rgba(255,255,255,0.03);
   color: var(--calendario-font);
+  font-family: 'Work Sans', sans-serif;
+  font-size: .9rem;
+  transition: border-color .2s ease;
+}
+
+.form_reserva_inner input::placeholder{
+  color: var(--muted, #a89a8c);
+}
+
+.form_reserva_inner input:hover,
+.form_reserva_inner input:focus,
+.form_reserva_inner select:hover,
+.form_reserva_inner select:focus{
+  border-color: var(--gold, #b08d57);
+  outline: none;
 }
 
 .form_reserva_inner select option{
@@ -205,16 +335,65 @@
   color: var(--calendario-font);
 }
 
-.resumo_final{
-  margin-top: 1rem;
-  padding: 0.7rem;
+#lista-carrinho{
+  list-style: none;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-produto{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.05);
-  font-size: 0.9rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line, rgba(237,230,218,0.1));
+}
+
+.nome-produto{
+  font-size: .82rem;
+  color: var(--calendario-font);
+}
+
+.resumo_final{
+  margin-top: 1.1rem;
+  padding: 0.9rem;
+  border-radius: 6px;
+  background-color: rgba(176, 141, 87, 0.08);
+  border: 1px solid rgba(176, 141, 87, 0.25);
+  font-size: 0.88rem;
+}
+
+.resumo_datahora{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px dashed rgba(176, 141, 87, 0.35);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-light, #d9b787);
+}
+
+.resumo_datahora i{
+  color: var(--gold, #b08d57);
+  margin-right: 0.4rem;
 }
 
 .resumo_final p{
-  margin: 0.2rem 0;
+  margin: 0.25rem 0;
+}
+
+.resumo_final strong{
+  color: var(--gold, #b08d57);
+  font-weight: 500;
 }
 
 #btnConfirmar:disabled{
@@ -224,46 +403,65 @@
 
 .msg_reserva{
   min-height: 1.2rem;
-  margin-top: 0.6rem;
-  font-size: 0.9rem;
+  margin-top: 0.7rem;
+  font-size: 0.86rem;
+  text-align: center;
+  color: var(--gold-light, #d9b787);
 }
 
 .form_botoes{
   display: flex;
-  gap: 0.6rem;
-  margin-top: 0.8rem;
+  gap: 0.7rem;
+  margin-top: 1rem;
 }
 
 .form_botoes button{
   flex: 1;
-  padding: 0.6rem;
+  padding: 0.75rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-family: "poppins", sans-serif;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .8rem;
+  transition: transform .15s ease, background-color .15s ease;
 }
 
 #btnConfirmar{
   background: var(--calendario-hoje);
-  color: white;
+  color: var(--cream, #ede6da);
+}
+
+#btnConfirmar:not(:disabled):hover{
+  transform: translateY(-2px);
 }
 
 #btnCancelar{
-  background-color: var(--calendario-desativo);
-  color: white;
+  background-color: transparent;
+  color: var(--muted, #a89a8c);
+  border: 1px solid var(--calendario-border-bottom) !important;
+}
+
+#btnCancelar:hover{
+  color: var(--cream, #ede6da);
+  border-color: var(--cream, #ede6da) !important;
 }
 
 .btnRemover {
-  background-color: rgb(180, 4, 4);
-  color: #ffffff;
-  padding: 10px 16px;
-  border: none;
+  background-color: transparent;
+  color: #e0736f;
+  border: 1px solid rgba(224, 115, 111, 0.4);
+  padding: 0.3rem 0.7rem;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-family: 'Space Mono', monospace;
+  font-size: .8rem;
+  transition: background-color .15s ease, color .15s ease;
 }
 
 .btnRemover:hover{
-  background-color: rgb(255, 49, 49);
-  color: #ffffff;
+  background-color: #e0736f;
+  color: var(--calendario-fundo);
 }
