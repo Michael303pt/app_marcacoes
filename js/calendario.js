@@ -479,7 +479,7 @@ btnConfirmarEL.addEventListener("click", async () => {
                 data: dataSelecionadaISO,
                 hora: horaSelecionada,
                 servico_id: parseInt(servicoSelecionadoEL.value, 10),
-                produto_id: produtoSelecionadoEL.value ? parseInt(produtoSelecionadoEL.value, 10) : null,
+                produtos: carrinho,
                 cliente_nome: clienteNomeEL.value.trim(),
                 cliente_contacto: clienteContactoEL.value.trim(),
                 cliente_email: clienteEmailEL.value.trim().toLowerCase(),
@@ -499,6 +499,8 @@ btnConfirmarEL.addEventListener("click", async () => {
         }
 
         msgReservaEL.textContent = "Marcação confirmada!";
+        carrinho = [];
+        renderCarrinho();
         setTimeout(() => {
             formReservaEL.classList.remove("ativo");
             btnConfirmarEL.disabled = false;

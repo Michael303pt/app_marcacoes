@@ -34,13 +34,14 @@ export default async function handler(req, res) {
         m.hora,
         m.cliente_nome,
         m.cliente_email,
-        s.nome AS servico_nome
+        s.nome AS servico_nome,
+        m.produtos
       FROM marcacoes m
       LEFT JOIN servicos s ON s.id = m.servico_id
       WHERE m.status = 'agendada'
         AND m.lembrete_enviado_em IS NULL
         AND m.cliente_email IS NOT NULL
-        AND m.data BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '3 days')::date
+        AND m.data BETWEEN CURRENT_DATE AND CURRENT_DATE + 3
     `;
 
     const baseUrl = process.env.SITE_URL || `https://${req.headers.host}`;
@@ -61,10 +62,15 @@ export default async function handler(req, res) {
         const linkConfirmar = `${baseUrl}/api/confirmar-marcacao?token=${token}&acao=confirmar`;
         const linkCancelar = `${baseUrl}/api/confirmar-marcacao?token=${token}&acao=cancelar`;
 
-        const dataFormatada = new Date(`${marcacao.data}T00:00:00`).toLocaleDateString(
-          "pt-PT",
-          { day: "2-digit", month: "long", year: "numeric" }
-        );
+        const data = marcacao.data instanceof Date
+          ? marcacao.data
+          : new Date(`${marcacao.data}T00:00:00`);
+
+        const dataFormatada = data.toLocaleDateString("pt-PT", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
 
         await enviarEmail({
           para: marcacao.cliente_email,
@@ -76,6 +82,7 @@ export default async function handler(req, res) {
             hora: marcacao.hora,
             profissional: marcacao.profissional,
             servico: marcacao.servico_nome,
+            produtos: marcacao.produtos,
             linkConfirmar,
             linkCancelar,
           }),
@@ -100,7 +107,14 @@ export default async function handler(req, res) {
   }
 }
 
-function montarHtmlLembrete({ nome, dataFormatada, hora, profissional, servico, linkConfirmar, linkCancelar }) {
+function montarHtmlLembrete({ nome, dataFormatada, hora, profissional, servico, produtos, linkConfirmar, linkCancelar }) {
+
+  const listaProdutos = Array.isArray(produtos) ? produtos : [];
+  const produtosHtml = listaProdutos.length
+    ? listaProdutos.map((item) => `${item.nome}${item.quantidade > 1 ? ` x${item.quantidade}` : ""}`).join(", "): null;
+
+
+
   return `
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color:#1b1714;">
       <h2 style="color:#8b2e2e; margin-bottom: 4px;">Olimpo Barbershop</h2>
@@ -110,7 +124,8 @@ function montarHtmlLembrete({ nome, dataFormatada, hora, profissional, servico, 
         <strong>Data:</strong> ${dataFormatada}<br>
         <strong>Hora:</strong> ${hora}<br>
         <strong>Profissional:</strong> ${profissional}<br>
-        <strong>Serviço:</strong> ${servico || "—"}
+        <strong>Serviço:</strong> ${servico || "—"}${produtosHtml ? `<br>
+        <strong>Produtos:</strong> ${produtosHtml}` : ""}        
       </div>
       <p>Por favor confirma a tua presença. Se não puderes vir, cancela para libertarmos o horário a outro cliente.</p>
       <p style="margin: 28px 0;">

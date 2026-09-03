@@ -4,7 +4,11 @@
 // email de lembrete. Não é chamado pelo frontend (calendario.js) — é acedido
 // diretamente pelo cliente a partir do email.
 
-import { sql } from "../lib/db.js";
+
+import { neon } from '@neondatabase/serverless';
+
+const sql = neon(process.env.DATABASE_URL);
+
 
 export default async function handler(req, res) {
   const { token, acao } = req.query;
@@ -13,6 +17,7 @@ export default async function handler(req, res) {
     return paginaResposta(res, 400, "Pedido inválido", "O link que usaste não é válido.");
   }
 
+  try {
   const linhas = await sql`
     SELECT id, cliente_nome, status
     FROM marcacoes
@@ -45,6 +50,13 @@ export default async function handler(req, res) {
     res, 200, "Marcação cancelada",
     `A tua marcação foi cancelada, ${marcacao.cliente_nome}. Se mudares de ideias, faz uma nova marcação no site.`
   );
+} catch (erro) {
+  console.error("Erro em /api/confirmar-marcacao:", erro);
+  return paginaResposta(
+    res, 500, "Ocorreu um erro",
+    "Não foi possível processar o teu pedido. Tenta novamente mais tarde ou contacta-nos diretamente."
+  );
+}
 }
 
 function paginaResposta(res, statusCode, titulo, mensagem) {

@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ erro: 'Método não permitido' });
     }
 
-    const { profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto, cliente_email } = req.body || {};
+    const { profissional, data, hora, servico_id, produtos, cliente_nome, cliente_contacto, cliente_email } = req.body || {};
 
     if (!profissional || !data || !hora || !servico_id || !cliente_nome || !cliente_contacto || !cliente_email) {
         return res.status(400).json({ erro: 'Faltam dados obrigatórios (profissional, data, hora, serviço, nome, telefone e email).' });
@@ -23,10 +23,17 @@ export default async function handler(req, res) {
         return res.status(400).json({ erro: 'Serviço inválido.' });
     }
 
-    // produto é opcional
-    const produtoIdFinal = (produto_id === undefined || produto_id === null || produto_id === '') ? null : produto_id;
-    if (produtoIdFinal !== null && !Number.isInteger(produtoIdFinal)) {
-        return res.status(400).json({ erro: 'Produto inválido.' });
+    // produtos é opcional — array de { id, nome, preco, quantidade }
+    const produtosFinal = Array.isArray(produtos) ? produtos : [];
+    const produtosValidos = produtosFinal.every((item) =>
+        item &&
+        Number.isInteger(item.id) &&
+        typeof item.nome === 'string' && item.nome.trim() !== '' &&
+        typeof item.preco === 'number' && item.preco >= 0 &&
+        Number.isInteger(item.quantidade) && item.quantidade > 0
+        );
+    if (!produtosValidos) {
+        return res.status(400).json({ erro: 'Lista de produtos inválida.' });
     }
 
     if (!/^\d{9}$/.test(cliente_contacto)) {
@@ -52,8 +59,8 @@ export default async function handler(req, res) {
         }
 
         await sql`
-            INSERT INTO marcacoes (profissional, data, hora, servico_id, produto_id, cliente_nome, cliente_contacto, cliente_email)
-            VALUES (${profissional}, ${data}::date, ${hora}::time, ${servico_id}, ${produtoIdFinal}, 
+            INSERT INTO marcacoes (profissional, data, hora, servico_id, produtos, cliente_nome, cliente_contacto, cliente_email)
+            VALUES (${profissional}, ${data}::date, ${hora}::time, ${servico_id}, ${JSON.stringify(produtosFinal)}::jsonb, 
             ${cliente_nome}, ${cliente_contacto}, ${clienteEmailFinal})
         `;
 
