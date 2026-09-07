@@ -49,12 +49,13 @@ export default async function handler(req, res) {
             ORDER BY hora
         `;
 
-        //horários reservados nesse dia
+        //horários reservados nesse dia (marcações canceladas não contam como ocupadas)
         const reservados = await sql`
             SELECT hora
             FROM marcacoes
             WHERE profissional = ${profissional}
               AND data = ${data}::date
+              AND status != 'cancelada'
         `;
 
         const horasReservadas = new Set(reservados.map((linha) => linha.hora.slice(0, 5)));
