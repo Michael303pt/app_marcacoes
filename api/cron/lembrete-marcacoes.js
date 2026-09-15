@@ -76,6 +76,7 @@ export default async function handler(req, res) {
           para: marcacao.cliente_email,
           nomeDestinatario: marcacao.cliente_nome,
           assunto: "Confirma a tua marcação — Olimpo Barbershop",
+          tags: [`marcacao-${marcacao.id}`],
           html: montarHtmlLembrete({
             nome: marcacao.cliente_nome,
             dataFormatada,
