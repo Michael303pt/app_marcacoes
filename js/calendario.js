@@ -433,7 +433,7 @@ function atualizarResumo() {
         </div>
         <p><strong>Profissional:</strong> ${profissional.value}</p>
         <p><strong>Serviço:</strong> ${nomeServico}</p>
-        <p><strong>Preço Serviço:</strong> ${precoServico} €</p>
+        <p><strong>Preço Serviço:</strong> ${precoServico}€</p>
         <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
         <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
