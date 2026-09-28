@@ -50,12 +50,12 @@ export default async function handler(req, res) {
     try {
         // duração do serviço (vem sempre da base de dados, nunca do cliente)
         const servico = await sql`
-            SELECT duracao FROM servicos WHERE id = ${servico_id} AND ativo = true
+            SELECT duracao_minutos FROM servicos WHERE id = ${servico_id} AND ativo = true
         `;
         if (servico.length === 0) {
             return res.status(400).json({ erro: 'Serviço inválido.' });
         }
-        const slots = slotsNecessarios(servico[0].duracao);
+        const slots = slotsNecessarios(servico[0].duracao_minutos);
 
         // todos os horários que o serviço ocupa têm de existir no horário de trabalho desse dia
         const horariosDia = await sql`

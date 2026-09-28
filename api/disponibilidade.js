@@ -48,12 +48,12 @@ export default async function handler(req, res) {
     try {
         // duração do serviço -> quantos horários seguidos precisa
         const servico = await sql`
-            SELECT duracao FROM servicos WHERE id = ${parseInt(servico_id, 10)} AND ativo = true
+            SELECT duracao_minutos FROM servicos WHERE id = ${parseInt(servico_id, 10)} AND ativo = true
         `;
         if (servico.length === 0) {
             return res.status(400).json({ erro: 'Serviço inválido.' });
         }
-        const slots = slotsNecessarios(servico[0].duracao);
+        const slots = slotsNecessarios(servico[0].duracao_minutos);
 
         //horários que um profissional trabalha, no dia da semana correspondente a "data"
         const horariosDefinidos = await sql`
