@@ -39,17 +39,20 @@ inputData.addEventListener("click", () => {
     calendario.classList.toggle("ativo");
 });
 
-// input do calendario desativado até sér selecionado um profissional no dropdown
-profissional.addEventListener("change", () => {
-    if (profissional.value === "") {
-        inputData.disabled = true;
-        inputData.value = "";
-    } else {
-        inputData.disabled = false;
-    }
+// input do calendario desativado até serem escolhidos profissional E serviço
+// (a disponibilidade depende da duração do serviço)
+function atualizarEstadoData() {
+    const pronto = profissional.value !== "" && servicoSelecionadoEL.value !== "";
+    inputData.disabled = !pronto;
+    if (!pronto) inputData.value = "";
+}
 
-    // ao trocar de profissional, esconde qualquer lista de horários antiga
-    esconderHorarios();
+// ao trocar de profissional ou de serviço, esconde qualquer lista de horários antiga
+[profissional, servicoSelecionadoEL].forEach((campo) => {
+    campo.addEventListener("change", () => {
+        atualizarEstadoData();
+        esconderHorarios();
+    });
 });
 
 produtoSelecionadoEL.addEventListener("change", () =>{
@@ -153,8 +156,6 @@ const mostrar_calendario = () => {
 
             calendario.classList.remove("ativo");
 
-            
-            
             carregarHorariosDisponiveis();
         });
     });
@@ -168,8 +169,6 @@ const mostrar_calendario = () => {
     const estamos_no_mes_atual =
         mes === new Date().getMonth() && ano === new Date().getFullYear();
     btnPrevEL.classList.toggle("desativo", estamos_no_mes_atual);
-
-    
 };
 
 // marca visualmente (classe "selecionado") o dia escolhido pelo utilizador, se pertencer ao mês visível
@@ -212,9 +211,8 @@ btn_EL.forEach((btns) => {
 
 //horários disponíveis
 async function carregarHorariosDisponiveis() {
-    if (!profissional.value || !dataSelecionadaISO) return;
+    if (!profissional.value || !servicoSelecionadoEL.value || !dataSelecionadaISO) return;
 
-    formReservaEL.classList.remove("ativo");
     horariosContainerEL.classList.add("ativo");
     listaHorariosEL.innerHTML = `<li class="a_carregar">A carregar horários…</li>`;
 
@@ -224,7 +222,7 @@ async function carregarHorariosDisponiveis() {
     }, 150);
 
     try {
-        const url = `/api/disponibilidade?profissional=${encodeURIComponent(profissional.value)}&data=${dataSelecionadaISO}`;
+        const url = `/api/disponibilidade?profissional=${encodeURIComponent(profissional.value)}&data=${dataSelecionadaISO}&servico_id=${encodeURIComponent(servicoSelecionadoEL.value)}`;
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
@@ -274,11 +272,9 @@ function abrirFormReserva(hora, elementoSelecionado) {
     clienteNomeEL.value = "";
     clienteContactoEL.value = "";
     clienteEmailEL.value = "";
-    servicoSelecionadoEL.innerHTML = `<option value="">A carregar serviços…</option>`;
     produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
     esconderResumo();
     formReservaEL.classList.add("ativo");
-    carregarServicos();
     carregarProdutos();
 
     setTimeout(() => {
@@ -312,6 +308,8 @@ async function carregarServicos() {
         servicoSelecionadoEL.innerHTML = `<option value="">Erro ao carregar serviços</option>`;
     }
 }
+
+carregarServicos();
 
 async function carregarProdutos() {
     try {
@@ -499,8 +497,6 @@ btnConfirmarEL.addEventListener("click", async () => {
         }
 
         msgReservaEL.textContent = "Marcação confirmada!";
-        carrinho = [];
-        renderCarrinho();
         setTimeout(() => {
             formReservaEL.classList.remove("ativo");
             btnConfirmarEL.disabled = false;

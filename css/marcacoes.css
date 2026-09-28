@@ -119,9 +119,11 @@ nav.wrap{
   border-radius:8px;
   padding:1.4rem 1.5rem;
   display:flex;
+  flex-wrap:wrap;
   gap:1rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
+.campo-data{ flex-basis:100%; }
 .campo-grupo{
   flex:1;
   display:flex;
@@ -135,7 +137,8 @@ nav.wrap{
   color:var(--gold);
   margin-bottom:.5rem;
 }
-#profi{
+#profi,
+#servicoSelecionado{
   width:100%;
   padding:.7rem .9rem;
   border-radius:5px;
@@ -153,8 +156,11 @@ nav.wrap{
   transition: border-color .2s ease;
 }
 #profi:hover,
-#profi:focus{ border-color: var(--gold); outline:none; }
-#profi option{
+#profi:focus,
+#servicoSelecionado:hover,
+#servicoSelecionado:focus{ border-color: var(--gold); outline:none; }
+#profi option,
+#servicoSelecionado option{
   background-color: var(--surface);
   color: var(--cream);
 }

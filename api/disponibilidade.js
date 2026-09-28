@@ -2,6 +2,8 @@
 
 import { neon } from '@neondatabase/serverless';
 
+import { slotsNecessarios, subHorarios, paraMinutos, INTERVALO_SLOT_MINUTOS } from '../lib/duracao.js';
+
 const sql = neon(process.env.DATABASE_URL);
 
 /* 
@@ -29,10 +31,14 @@ export default async function handler(req, res) {
         return res.status(405).json({ erro: 'Método não permitido' });
     }
 
-    const { profissional, data } = req.query;
+    const { profissional, data, servico_id } = req.query;
 
-    if (!profissional || !data) {
-        return res.status(400).json({ erro: 'Faltam os parâmetros "profissional" e "data".' });
+    if (!profissional || !data || !servico_id) {
+        return res.status(400).json({ erro: 'Faltam os parâmetros "profissional", "data" e "servico_id".' });
+    }
+
+    if (!/^\d+$/.test(servico_id)) {
+        return res.status(400).json({ erro: 'Serviço inválido.' });
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
@@ -40,6 +46,15 @@ export default async function handler(req, res) {
     }
 
     try {
+        // duração do serviço -> quantos horários seguidos precisa
+        const servico = await sql`
+            SELECT duracao FROM servicos WHERE id = ${parseInt(servico_id, 10)} AND ativo = true
+        `;
+        if (servico.length === 0) {
+            return res.status(400).json({ erro: 'Serviço inválido.' });
+        }
+        const slots = slotsNecessarios(servico[0].duracao);
+
         //horários que um profissional trabalha, no dia da semana correspondente a "data"
         const horariosDefinidos = await sql`
             SELECT hora
@@ -49,20 +64,33 @@ export default async function handler(req, res) {
             ORDER BY hora
         `;
 
-        //horários reservados nesse dia (marcações canceladas não contam como ocupadas)
+        //marcações ativas nesse dia, como intervalos [hora, hora_fim) (canceladas não contam)
         const reservados = await sql`
-            SELECT hora
+            SELECT hora, hora_fim
             FROM marcacoes
             WHERE profissional = ${profissional}
               AND data = ${data}::date
               AND status != 'cancelada'
         `;
 
-        const horasReservadas = new Set(reservados.map((linha) => linha.hora.slice(0, 5)));
+        const intervalosOcupados = reservados.map((linha) => ({
+            inicio: paraMinutos(linha.hora.slice(0, 5)),
+            fim: paraMinutos(linha.hora_fim.slice(0, 5)),
+        }));
 
-        let disponiveis = horariosDefinidos
-            .map((linha) => linha.hora.slice(0, 5))
-            .filter((hora) => !horasReservadas.has(hora));
+        const horasDefinidas = horariosDefinidos.map((linha) => linha.hora.slice(0, 5));
+        const setDefinidas = new Set(horasDefinidas);
+
+        // uma hora só está disponível se TODOS os horários que o serviço ocupa
+        // existem no horário de trabalho e nenhum colide com uma marcação existente
+        const cabe = (hora) => {
+            if (!subHorarios(hora, slots).every((h) => setDefinidas.has(h))) return false;
+            const inicio = paraMinutos(hora);
+            const fim = inicio + slots * INTERVALO_SLOT_MINUTOS;
+            return !intervalosOcupados.some((o) => inicio < o.fim && fim > o.inicio);
+        };
+
+        let disponiveis = horasDefinidas.filter(cabe);
 
         // se a data escolhida for hoje, remove horários que já passaram
         const { data: hojeISO, hora: horaAgora } = HojeDataHora();
