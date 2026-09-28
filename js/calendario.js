@@ -296,9 +296,7 @@ async function carregarServicos() {
         dados.servicos.forEach((servico) => {
             const opcao = document.createElement("option");
             opcao.value = servico.id;
-            opcao.textContent = servico.preco
-                ? `${servico.nome} — ${Number(servico.preco).toFixed(2)}€`
-                : servico.nome;
+            opcao.textContent = servico.nome;
             opcao.dataset.nome = servico.nome;
             opcao.dataset.preco = servico.preco;
             servicoSelecionadoEL.appendChild(opcao);
@@ -435,6 +433,7 @@ function atualizarResumo() {
         </div>
         <p><strong>Profissional:</strong> ${profissional.value}</p>
         <p><strong>Serviço:</strong> ${nomeServico}</p>
+        <p><strong>Preço Serviço:</strong> ${precoServico} €</p>
         <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
         <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
