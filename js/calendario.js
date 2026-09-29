@@ -296,7 +296,9 @@ async function carregarServicos() {
         dados.servicos.forEach((servico) => {
             const opcao = document.createElement("option");
             opcao.value = servico.id;
-            opcao.textContent = servico.nome;
+            opcao.textContent = servico.preco
+                ? `${servico.nome} — ${Number(servico.preco).toFixed(2)}€`
+                : servico.nome;
             opcao.dataset.nome = servico.nome;
             opcao.dataset.preco = servico.preco;
             servicoSelecionadoEL.appendChild(opcao);
@@ -308,6 +310,31 @@ async function carregarServicos() {
 }
 
 carregarServicos();
+
+async function carregarProfissionais() {
+    try {
+        const resposta = await fetch("/api/profissionais");
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.profissionais || dados.profissionais.length === 0) {
+            profissional.innerHTML = `<option value="" disabled selected hidden>Sem profissionais disponíveis</option>`;
+            return;
+        }
+
+        profissional.innerHTML = `<option value="" disabled selected hidden>escolha o profissional</option>`;
+        dados.profissionais.forEach((p) => {
+            const opcao = document.createElement("option");
+            opcao.value = p.nome;
+            opcao.textContent = p.nome;
+            profissional.appendChild(opcao);
+        });
+    } catch (erro) {
+        console.error(erro);
+        profissional.innerHTML = `<option value="" disabled selected hidden>Erro ao carregar profissionais</option>`;
+    }
+}
+
+carregarProfissionais();
 
 async function carregarProdutos() {
     try {
@@ -432,8 +459,7 @@ function atualizarResumo() {
             <span><i class="fa-solid fa-clock"></i>${horaSelecionada}</span>
         </div>
         <p><strong>Profissional:</strong> ${profissional.value}</p>
-        <p><strong>Serviço:</strong> ${nomeServico}</p>
-        <p><strong>Preço Serviço:</strong> ${precoServico}€</p>
+        <p><strong>Serviço:</strong> ${nomeServico} - ${precoServico}</p>
         <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
         <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
