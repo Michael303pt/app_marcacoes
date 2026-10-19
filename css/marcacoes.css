@@ -87,6 +87,12 @@ nav.wrap {
   color: var(--gold);
 }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
 .back-link {
   text-decoration: none;
   font-family: 'Space Mono', monospace;

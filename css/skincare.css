@@ -47,7 +47,10 @@
     transition:color .2s ease;
   }
   nav a:hover{ color:var(--ink); }
-  @media (max-width:640px){ nav ul{ display:none; } }
+  @media (max-width:640px){
+    nav ul{ gap:0; }
+    nav ul li:not(.nav-inicio){ display:none; } /* em mobile só fica o "Início" */
+  }
 
   /* ---------- hero ---------- */
   .hero{

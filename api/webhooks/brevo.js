@@ -7,8 +7,8 @@
 // para o painel de administração sinalizar isto ao dono do negócio.
 //
 // A Brevo identifica a marcação através da "tag" que enviámos ao criar o
-// email (ver lib/email.js e api/cron/lembrete-marcacoes.js), no formato
-// "marcacao-<id>".
+// email (ver lib/email.js e os crons em api/cron/), no formato "marcacao-<id>"
+// (barbershop) ou "skincare-<id>" (skincare).
 //
 // Autenticação: no painel da Brevo, escolhe o método "Token" ao criar o
 // webhook e cola aí o mesmo valor que definires na variável de ambiente
@@ -51,34 +51,59 @@ export default async function handler(req, res) {
     for (const evento of eventos) {
       if (!evento || !EVENTOS_INVALIDOS.has(evento.event)) continue;
 
-      let marcacaoId = extrairMarcacaoId(evento);
+      // { origem: 'barbershop' | 'skincare', id } — a tag diz de que negócio é o email
+      let alvo = extrairMarcacao(evento);
 
       // fallback: alguns eventos (ex. invalid_email) não trazem a tag —
       // nesse caso tentamos associar pelo email, à marcação mais recente
-      // que teve um lembrete enviado para esse endereço
-      if (!marcacaoId && evento.email) {
-        const porEmail = await sql`
-          SELECT id FROM marcacoes
-          WHERE cliente_email = ${evento.email}
-            AND status != 'cancelada'
-            AND lembrete_enviado_em IS NOT NULL
-          ORDER BY lembrete_enviado_em DESC
-          LIMIT 1
-        `;
-        if (porEmail[0]) {
-          marcacaoId = porEmail[0].id;
+      // (barbershop ou skincare) que teve um lembrete enviado para esse endereço
+      if (!alvo && evento.email) {
+        const [barbershop, skincare] = await Promise.all([
+          sql`
+            SELECT id, lembrete_enviado_em FROM marcacoes
+            WHERE cliente_email = ${evento.email}
+              AND status != 'cancelada'
+              AND lembrete_enviado_em IS NOT NULL
+            ORDER BY lembrete_enviado_em DESC
+            LIMIT 1
+          `,
+          sql`
+            SELECT id, lembrete_enviado_em FROM marcacoes_skincare
+            WHERE cliente_email = ${evento.email}
+              AND status != 'cancelada'
+              AND lembrete_enviado_em IS NOT NULL
+            ORDER BY lembrete_enviado_em DESC
+            LIMIT 1
+          `,
+        ]);
+        const b = barbershop[0];
+        const s = skincare[0];
+        if (b && (!s || b.lembrete_enviado_em >= s.lembrete_enviado_em)) {
+          alvo = { origem: 'barbershop', id: b.id };
+        } else if (s) {
+          alvo = { origem: 'skincare', id: s.id };
         }
       }
 
-      if (!marcacaoId) continue;
+      if (!alvo) continue;
 
-      await sql`
-        UPDATE marcacoes
-        SET email_invalido = true,
-            email_bounce_evento = ${evento.event},
-            email_bounce_em = now()
-        WHERE id = ${marcacaoId}
-      `;
+      if (alvo.origem === 'skincare') {
+        await sql`
+          UPDATE marcacoes_skincare
+          SET email_invalido = true,
+              email_bounce_evento = ${evento.event},
+              email_bounce_em = now()
+          WHERE id = ${alvo.id}
+        `;
+      } else {
+        await sql`
+          UPDATE marcacoes
+          SET email_invalido = true,
+              email_bounce_evento = ${evento.event},
+              email_bounce_em = now()
+          WHERE id = ${alvo.id}
+        `;
+      }
     }
 
     // responder sempre 200 rapidamente — a Brevo tem mecanismo de retry se falhar
@@ -91,18 +116,32 @@ export default async function handler(req, res) {
   }
 }
 
-function extrairMarcacaoId(evento) {
+function extrairMarcacao(evento) {
   // formato documentado: array de strings
   if (Array.isArray(evento.tags)) {
     for (const tag of evento.tags) {
-      const match = /^marcacao-(\d+)$/.exec(tag);
-      if (match) return parseInt(match[1], 10);
+      const encontrada = interpretarTag(tag, true);
+      if (encontrada) return encontrada;
     }
   }
   // formato observado em alguns payloads: string única no campo "tag"
   if (typeof evento.tag === 'string') {
-    const match = /marcacao-(\d+)/.exec(evento.tag);
-    if (match) return parseInt(match[1], 10);
+    return interpretarTag(evento.tag, false);
   }
+  return null;
+}
+
+// "marcacao-12" -> barbershop #12; "skincare-7" -> skincare #7
+function interpretarTag(tag, exata) {
+  if (typeof tag !== 'string') return null;
+  const regexBarbershop = exata ? /^marcacao-(\d+)$/ : /marcacao-(\d+)/;
+  const regexSkincare = exata ? /^skincare-(\d+)$/ : /skincare-(\d+)/;
+
+  const barbershop = regexBarbershop.exec(tag);
+  if (barbershop) return { origem: 'barbershop', id: parseInt(barbershop[1], 10) };
+
+  const skincare = regexSkincare.exec(tag);
+  if (skincare) return { origem: 'skincare', id: parseInt(skincare[1], 10) };
+
   return null;
 }

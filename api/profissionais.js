@@ -11,11 +11,13 @@ export default async function handler(req, res) {
 
     try {
         // só o nome é exposto — nunca email nem password_hash.
+        // Só utilizadores da barbershop (skincare = false); a profissional de skincare fica de fora.
         // O nome tem de coincidir com o texto guardado em horarios.profissional
         // e marcacoes.profissional (é assim que as duas tabelas se ligam).
         const profissionais = await sql`
             SELECT COALESCE(NULLIF(TRIM(full_name), ''), username) AS nome
             FROM users
+            WHERE skincare = false
             ORDER BY nome
         `;
 

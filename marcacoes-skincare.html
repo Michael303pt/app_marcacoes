@@ -1,0 +1,126 @@
+<!-- marcacoes-skincare.html -->
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcações · Olimpo Skincare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="css/marcacoes-skincare.css">
+    <script src="js/calendario-skincare.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav class="wrap">
+            <a href="skincare.html" class="logo">Olimpo Skincare</a>
+            <div class="nav-links">
+                <a href="index.html" class="back-link"><i class="fa-solid fa-house"></i> <span>Início</span></a>
+                <a href="skincare.html" class="back-link"><i class="fa-solid fa-arrow-left-long"></i> <span>Voltar</span></a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="marc-intro">
+        <div class="wrap">
+            <div class="eyebrow">Reserve o seu horário</div>
+            <h1>Marcações</h1>
+            <p class="lead">Escolha o tratamento e a data. Simples, rápido, sem esperas.</p>
+        </div>
+    </section>
+
+    <section class="seletor">
+        <div class="seletor_inner">
+            <div class="campo-grupo">
+                <label for="servicoSelecionado">Tratamento</label>
+                <select id="servicoSelecionado">
+                    <option value="">A carregar tratamentos…</option>
+                </select>
+            </div>
+
+            <div class="campo-grupo campo-data">
+                <label for="dataMarcacao">Data</label>
+                <div class="campo-data_input">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <input
+                        type="text"
+                        id="dataMarcacao"
+                        placeholder="Selecione uma data"
+                        readonly
+                        disabled
+                    >
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="calendario_marc" id="calendario">
+        <div class="calendario">
+            <div class="inner_calendario">
+                <div class="calendario_controlos">
+                    <div class="calendar_headings">
+                        <i class="fa-solid fa-arrow-left" id="prev" role="button" aria-label="Mês anterior"></i>
+                        <h2 class="month_year"></h2> <!-- preenchido no .js -->
+                        <i class="fa-solid fa-arrow-right" id="next" role="button" aria-label="Mês seguinte"></i>
+                    </div>
+                    <div class="data">
+                        <ul class="dias_semana">
+                            <li>Dom</li>
+                            <li>Seg</li>
+                            <li>Ter</li>
+                            <li>Qua</li>
+                            <li>Qui</li>
+                            <li>Sex</li>
+                            <li>Sáb</li>
+                        </ul>
+                        <ul class="dias"></ul> <!-- preenchido no .js -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="horarios_marc" id="horariosContainer">
+        <div class="horarios_inner">
+            <h3>Horários disponíveis</h3>
+            <ul class="lista_horarios" id="listaHorarios"></ul>
+        </div>
+    </section>
+
+    <section class="form_reserva" id="formReserva">
+        <div class="form_reserva_inner">
+            <h3>Marcação</h3>
+
+            <label for="produtoSelecionado">Produto (opcional)</label>
+            <select id="produtoSelecionado">
+                <option value="" hidden>Escolha um produto</option>
+            </select>
+
+            <label for="lista-carrinho">Carrinho</label>
+            <ul id="lista-carrinho" hidden></ul>
+
+            <label for="clienteNome">Nome</label>
+            <input type="text" id="clienteNome" placeholder="O seu nome" maxlength="100" autocomplete="name" required>
+
+            <label for="clienteContacto">Telefone</label>
+            <input type="tel" id="clienteContacto" placeholder="9 dígitos" inputmode="numeric" maxlength="9" autocomplete="tel-national" required>
+
+            <label for="clienteEmail">Email</label>
+            <input type="email" id="clienteEmail" placeholder="o.seu@email.com" autocomplete="email" required>
+            <p class="campo-nota">Enviamos aqui um lembrete 3 dias antes, para confirmar ou cancelar.</p>
+
+            <div class="resumo_final" id="resumoReserva" hidden></div>
+
+            <p class="msg_reserva" id="msgReserva" role="status"></p>
+            <div class="form_botoes">
+                <button type="button" id="btnConfirmar" hidden>Confirmar marcação</button>
+                <button type="button" id="btnCancelar">Cancelar</button>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
