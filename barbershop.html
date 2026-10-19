@@ -19,6 +19,7 @@
     <ul>
       <li class="nav-inicio"><a href="index.html">Início</a></li>
       <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#produtos">Produtos</a></li>
       <li><a href="#horario">Horário</a></li>
       <li><a href="#contacto">Contacto</a></li>
     </ul>
@@ -45,32 +46,20 @@
       <h2>Serviços</h2>
       <div class="eyebrow" style="margin-top: 8px;">O que fazemos</div>
     </div>
-    <div class="service-list">
-      <div class="service-row">
-        <div class="service-name">Corte clássico</div>
-        <div class="service-desc">Tesoura e máquina</div>
-        <div class="service-price">15€</div>
-      </div>
-      <div class="service-row">
-        <div class="service-name">Corte clássico</div>
-        <div class="service-desc">Tesoura e máquina</div>
-        <div class="service-price">15€</div>
-      </div>
-      <div class="service-row">
-        <div class="service-name">Corte clássico</div>
-        <div class="service-desc">Tesoura e máquina</div>
-        <div class="service-price">15€</div>
-      </div>
-      <div class="service-row">
-        <div class="service-name">Corte clássico</div>
-        <div class="service-desc">Tesoura e máquina</div>
-        <div class="service-price">15€</div>
-      </div>
-      <div class="service-row">
-        <div class="service-name">Corte clássico</div>
-        <div class="service-desc">Tesoura e máquina</div>
-        <div class="service-price">15€</div>
-      </div>
+    <div class="service-list" id="lista-servicos">
+      <p class="list-msg">A carregar serviços…</p>
+    </div>
+  </div>
+</section>
+
+<section class="products" id="produtos">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Produtos</h2>
+      <div class="eyebrow" style="margin-top: 8px;">À venda na barbearia</div>
+    </div>
+    <div class="service-list" id="lista-produtos">
+      <p class="list-msg">A carregar produtos…</p>
     </div>
   </div>
 </section>
@@ -103,6 +92,58 @@
     <a class="home" href="index.html">← Voltar à página inicial</a>
   </div>
 </footer>
+
+<script>
+const formatarPreco = (v) => {
+  const n = Number(v);
+  return (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',')) + '€';
+};
+
+function criarLinha(nome, extra, preco) {
+  const row = document.createElement('div');
+  row.className = 'service-row';
+  [['service-name', nome], ['service-desc', extra], ['service-price', preco]].forEach(([cls, txt]) => {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = txt;
+    row.appendChild(el);
+  });
+  return row;
+}
+
+function preencher(id, itens, vazio, criar) {
+  const lista = document.getElementById(id);
+  lista.replaceChildren();
+  if (!itens || itens.length === 0) {
+    lista.innerHTML = '<p class="list-msg"></p>';
+    lista.firstChild.textContent = vazio;
+    return;
+  }
+  itens.forEach((i) => lista.appendChild(criar(i)));
+}
+
+function erro(id, msg) {
+  const lista = document.getElementById(id);
+  lista.innerHTML = '<p class="list-msg"></p>';
+  lista.firstChild.textContent = msg;
+}
+
+async function carregar(url, chave) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return (await r.json())[chave];
+}
+
+carregar('/api/servicos', 'servicos')
+  .then((l) => preencher('lista-servicos', l, 'Sem serviços disponíveis.',
+    (s) => criarLinha(s.nome, s.duracao_minutos ? s.duracao_minutos + ' min' : '', formatarPreco(s.preco))))
+  .catch(() => erro('lista-servicos', 'Não foi possível carregar os serviços.'));
+
+carregar('/api/produtos', 'produtos')
+  .then((l) => preencher('lista-produtos', l, 'Sem produtos disponíveis.',
+    (p) => criarLinha(p.nome, '', formatarPreco(p.preco))))
+  .catch(() => erro('lista-produtos', 'Não foi possível carregar os produtos.'));
+</script>
 
 </body>
 </html>

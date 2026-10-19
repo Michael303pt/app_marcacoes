@@ -197,6 +197,10 @@
     .service-desc{ order:3; }
   }
 
+  .products .service-desc{ flex:0; }
+  .products .service-name{ flex:1; }
+  .list-msg{ color:var(--muted); font-family:'Space Mono', monospace; font-size:.88rem; padding:1.5rem 0; }
+
   /* ---------- horas / contacto ---------- */
   .info-grid{
     display:grid;
