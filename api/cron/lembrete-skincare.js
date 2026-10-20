@@ -1,11 +1,10 @@
 // api/cron/lembrete-skincare.js
-//
-// Cron diário (ver vercel.json) — equivalente a lembrete-marcacoes.js, mas para
-// marcacoes_skincare. Envia à cliente um email com links para confirmar ou
-// cancelar a marcação (lib/skincare-handlers/confirmar-marcacao.js).
-//
-// A tag enviada à Brevo é "skincare-<id>" (e não "marcacao-<id>") para o webhook
-// (api/webhooks/brevo.js) saber em que tabela marcar o email como inválido.
+
+/* 
+Cron diário — equivalente a lembrete-marcacoes.js, mas para
+marcacoes_skincare. Envia ao cliente um email com links para confirmar ou
+cancelar a marcação
+*/
 
 import { neon } from '@neondatabase/serverless';
 import crypto from "node:crypto";
@@ -16,7 +15,7 @@ import { NOME_NEGOCIO_SKINCARE, escapeHtml } from "../../lib/skincare.js";
 const sql = neon(process.env.DATABASE_URL);
 
 export default async function handler(req, res) {
-  // protege o endpoint: só aceita pedidos da Vercel Cron (ou com o segredo certo)
+  //só aceita pedidos da Vercel Cron
   if (process.env.CRON_SECRET) {
     const autorizacao = req.headers["authorization"];
     if (autorizacao !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -25,7 +24,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // marcações próximas (até 3 dias), ainda sem lembrete enviado
     const marcacoes = await sql`
       SELECT
         m.id,
@@ -47,10 +45,10 @@ export default async function handler(req, res) {
     const resultados = [];
 
     for (const marcacao of marcacoes) {
+      // UUID aleatório
       const token = crypto.randomUUID();
 
       try {
-        // gera e guarda o token ANTES de enviar, para o link no email ser válido
         await sql`
           UPDATE marcacoes_skincare
           SET token_confirmacao = ${token},
@@ -61,6 +59,7 @@ export default async function handler(req, res) {
         const linkConfirmar = `${baseUrl}/api/skincare/marcacoes?token=${token}&acao=confirmar`;
         const linkCancelar = `${baseUrl}/api/skincare/marcacoes?token=${token}&acao=cancelar`;
 
+        //a coluna date chega como Date ou como texto "AAAA-MM-DD"
         const data = marcacao.data instanceof Date
           ? marcacao.data
           : new Date(`${marcacao.data}T00:00:00`);
@@ -80,6 +79,7 @@ export default async function handler(req, res) {
           html: montarHtmlLembrete({
             nome: marcacao.cliente_nome,
             dataFormatada,
+            //"HH:MM:SS" -> "HH:MM"
             hora: String(marcacao.hora).slice(0, 5),
             servico: marcacao.servico_nome,
             produtos: marcacao.produtos,
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
           }),
         });
 
-        // só marca como enviado se o email foi mesmo entregue à Brevo com sucesso
+        //só marca como enviado se o email for mesmo entregue no Brevo com sucesso
         await sql`
           UPDATE marcacoes_skincare SET lembrete_enviado_em = now() WHERE id = ${marcacao.id}
         `;

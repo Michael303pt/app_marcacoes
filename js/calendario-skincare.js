@@ -1,7 +1,5 @@
 // calendario-skincare.js
-//
 // Igual ao calendario.js da barbershop, mas sem escolha de profissional
-// (há só uma, resolvida no servidor) e a falar com /api/skincare/*.
 
 const inputData = document.getElementById("dataMarcacao");
 const calendario = document.getElementById("calendario");
@@ -19,11 +17,13 @@ const btnConfirmarEL = document.getElementById("btnConfirmar");
 const btnCancelarEL = document.getElementById("btnCancelar");
 const carrinhoListaEL = document.getElementById("lista-carrinho");
 
+//estado da marcação que está a ser feita
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // AAAA-MM-DD, usado na API
-let dataSelecionada = null; // { dia, mes, ano } do dia clicado no calendário
-let carrinho = []; // [{ id, nome, preco, quantidade }]
+let dataSelecionada = null; // { dia, mes, ano }
+let carrinho = []; //[{ id, nome, preco, quantidade }]
 
+//tudo o que vem da base de dados e entra num innerHTML passa por aqui
 function escapeHtml(valor) {
     return String(valor ?? "")
         .replace(/&/g, "&amp;")
@@ -33,16 +33,17 @@ function escapeHtml(valor) {
         .replace(/'/g, "&#39;");
 }
 
-// telefone: só dígitos, no máximo 9
+//só dígitos, no máximo 9 -> no telefone/telemóvel
 clienteContactoEL.addEventListener("input", () => {
     clienteContactoEL.value = clienteContactoEL.value.replace(/\D/g, "").slice(0, 9);
 });
 
+//ao clicar no campo abre/fecha o popup do calendário
 inputData.addEventListener("click", () => {
     calendario.classList.toggle("ativo");
 });
 
-// o calendário só abre depois de escolhido o tratamento (a disponibilidade depende da duração)
+//o calendário só abre depois de escolher uma opção (a disponibilidade depende da duração)
 function atualizarEstadoData() {
     const pronto = servicoSelecionadoEL.value !== "";
     inputData.disabled = !pronto;
@@ -52,7 +53,7 @@ function atualizarEstadoData() {
     }
 }
 
-// ao trocar de tratamento, esconde qualquer lista de horários antiga
+//ao trocar de opção, esconde qualquer lista de horários antiga
 servicoSelecionadoEL.addEventListener("change", () => {
     atualizarEstadoData();
     esconderHorarios();
@@ -68,7 +69,7 @@ produtoSelecionadoEL.addEventListener("change", () => {
 
     produtoSelecionadoEL.value = "";
 
-    // produto já no carrinho -> só aumenta a quantidade
+    // produto já no carrinho -> aumenta a quantidade
     const igual = carrinho.find((item) => item.id === id);
     if (igual) igual.quantidade++;
     else carrinho.push({ id, nome, preco, quantidade: 1 });
@@ -77,7 +78,7 @@ produtoSelecionadoEL.addEventListener("change", () => {
     atualizarResumo();
 });
 
-// ---------- calendário ----------
+//---------- calendário ----------
 const dias_EL = document.querySelector(".dias");
 const btn_EL = document.querySelectorAll(".calendar_headings .fa-solid");
 const dias_meses_EL = document.querySelector(".month_year");
@@ -88,28 +89,34 @@ const MESES = [
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
+//serve de referência para o mês inicial e para bloquear o passado
 const agora = new Date();
 let mes = agora.getMonth();
 let ano = agora.getFullYear();
 
-// hoje (sem horas), para comparar dias passados
+//para comparar dias passados
 const hoje_sem_horas = new Date();
 hoje_sem_horas.setHours(0, 0, 0, 0);
 
+// desenha o mês (mes/ano) na grelha
+//os dias do mês e dias do seguinte para fechar a última semana
 const mostrar_calendario = () => {
+    // getDay() -> 0 = domingo ... 6 = sábado. new Date(ano, mes + 1, 0) dá o último dia do mês
+    // (o dia 0 é a véspera do dia 1)
     const primeiro_dia_do_mes = new Date(ano, mes, 1).getDay();
     const ultima_data_do_mes = new Date(ano, mes + 1, 0).getDate();
     const ultimo_dia_do_mes = new Date(ano, mes, ultima_data_do_mes).getDay();
     const ultimo_data_do_ultimo_mes = new Date(ano, mes, 0).getDate();
     let dias = "";
 
-    // dias do mês anterior
+    //dias do mês anterior
     for (let x = primeiro_dia_do_mes; x > 0; x--) {
         dias += `<li class="desativo">${ultimo_data_do_ultimo_mes - x + 1}</li>`;
     }
 
     for (let x = 1; x <= ultima_data_do_mes; x++) {
         const data_do_dia = new Date(ano, mes, x);
+        //compara timestamps: hoje_sem_horas tem as horas a zero, tal como data_do_dia
         const e_hoje = data_do_dia.getTime() === hoje_sem_horas.getTime();
         const ja_passou = data_do_dia < hoje_sem_horas;
         const classe = ja_passou ? "desativo passado" : e_hoje ? "hoje" : "";
@@ -117,7 +124,8 @@ const mostrar_calendario = () => {
         dias += `<li class="${classe}">${x}</li>`;
     }
 
-    // primeiros dias do próximo mês
+    //primeiros dias do próximo mês
+    //completa a última semana até sábado
     for (let x = ultimo_dia_do_mes; x < 6; x++) {
         dias += `<li class="desativo">${x - ultimo_dia_do_mes + 1}</li>`;
     }
@@ -146,12 +154,12 @@ const mostrar_calendario = () => {
 
     dias_meses_EL.textContent = `${MESES[mes]}, ${ano}`;
 
-    // não deixa recuar para meses passados
+    //não deixa recuar para meses passados
     const estamos_no_mes_atual = mes === agora.getMonth() && ano === agora.getFullYear();
     btnPrevEL.classList.toggle("desativo", estamos_no_mes_atual);
 };
 
-// marca (classe "selecionado") o dia escolhido, se pertencer ao mês visível
+//marca o dia escolhido, se pertencer ao mês visível
 function marcarDiaSelecionado() {
     dias_EL.querySelectorAll("li.selecionado").forEach((el) => el.classList.remove("selecionado"));
 
@@ -165,7 +173,7 @@ function marcarDiaSelecionado() {
 
 mostrar_calendario();
 
-// botões mês anterior / seguinte
+//botões mês anterior/seguinte
 btn_EL.forEach((btn) => {
     btn.addEventListener("click", () => {
         if (btn.id === "prev" && mes === agora.getMonth() && ano === agora.getFullYear()) return;
@@ -182,6 +190,7 @@ btn_EL.forEach((btn) => {
 async function carregarHorariosDisponiveis() {
     if (!servicoSelecionadoEL.value || !dataSelecionadaISO) return;
 
+    //guarda o que foi pedido: a resposta pode chegar depois de a cliente já ter mudado de dia
     const dataPedida = dataSelecionadaISO;
     const servicoPedido = servicoSelecionadoEL.value;
 
@@ -197,7 +206,7 @@ async function carregarHorariosDisponiveis() {
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
-        // a resposta chegou depois de a cliente mudar de data/tratamento -> ignora
+        //a resposta chegou depois de a cliente mudar de data/tratamento -> ignora
         if (dataPedida !== dataSelecionadaISO || servicoPedido !== servicoSelecionadoEL.value) return;
 
         if (!resposta.ok) {
@@ -215,6 +224,7 @@ async function carregarHorariosDisponiveis() {
             const item = document.createElement("li");
             item.className = "horario_item";
             item.textContent = hora;
+            //o <li> passa a ser focável e responde a Enter/Espaço
             item.tabIndex = 0;
             item.addEventListener("click", () => abrirFormReserva(hora, item));
             item.addEventListener("keydown", (e) => {
@@ -253,6 +263,7 @@ function abrirFormReserva(hora, elementoSelecionado) {
     clienteNomeEL.value = "";
     clienteContactoEL.value = "";
     clienteEmailEL.value = "";
+    //faz com que o carrinho começe vazio
     carrinho = [];
     renderCarrinho();
     produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
@@ -274,7 +285,7 @@ function textoPreco(preco) {
     return `${Number(preco).toFixed(2)}€`;
 }
 
-let produtosCatalogo = []; // vêm no mesmo pedido que os tratamentos
+let produtosCatalogo = [];
 
 async function carregarServicos() {
     try {
@@ -295,6 +306,7 @@ async function carregarServicos() {
             opcao.textContent = servico.preco
                 ? `${servico.nome} — ${textoPreco(servico.preco)}${duracao}`
                 : `${servico.nome}${duracao}`;
+            // nome e preço ficam no dataset para o resumo os ler depois sem voltar ao servidor
             opcao.dataset.nome = servico.nome;
             opcao.dataset.preco = servico.preco;
             servicoSelecionadoEL.appendChild(opcao);
@@ -305,8 +317,10 @@ async function carregarServicos() {
     }
 }
 
+// ao abrir a página vão-se buscar os dados que os selects precisam
 carregarServicos();
 
+//os produtos já vieram com o catálogo, em carregarServicos
 function carregarProdutos() {
     if (produtosCatalogo.length === 0) {
         produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
@@ -326,6 +340,7 @@ function carregarProdutos() {
     });
 }
 
+//o subtotal só aparece no carrinho, quando quantidade > 1
 function linhaProduto(item, comSubtotal) {
     const base = `${escapeHtml(item.nome)} — ${textoPreco(item.preco)}`;
     if (item.quantidade > 1) {
@@ -352,6 +367,7 @@ function renderCarrinho() {
     `).join("");
 }
 
+//um só listener serve todos os botões "-", mesmo os que o renderCarrinho
 carrinhoListaEL.addEventListener("click", (evento) => {
     const botao = evento.target.closest(".btnRemover");
     if (!botao) return;
@@ -382,7 +398,7 @@ function esconderResumo() {
     btnConfirmarEL.hidden = true;
 }
 
-// o resumo só aparece depois de tudo estar preenchido corretamente
+//o resumo só aparece depois de tudo estar preenchido corretamente
 function atualizarResumo() {
     if (!formularioValido()) {
         esconderResumo();
@@ -421,6 +437,7 @@ function atualizarResumo() {
     }
 }
 
+// qualquer alteração refaz o resumo
 [produtoSelecionadoEL, clienteNomeEL, clienteContactoEL, clienteEmailEL].forEach((campo) => {
     campo.addEventListener("input", atualizarResumo);
 });
@@ -432,6 +449,7 @@ btnCancelarEL.addEventListener("click", () => {
 btnConfirmarEL.addEventListener("click", async () => {
     if (!formularioValido()) return;
 
+    //desativa o botão para um duplo clique não criar duas marcações
     btnConfirmarEL.disabled = true;
     mostrarMensagem("A confirmar…");
 
@@ -461,6 +479,7 @@ btnConfirmarEL.addEventListener("click", async () => {
             return;
         }
 
+        //passado 1,5 s fecha o formulário e recarrega os horários (o que acabou de ser marcado desaparece)
         mostrarMensagem("Marcação confirmada! Obrigada.");
         setTimeout(() => {
             formReservaEL.classList.remove("ativo");

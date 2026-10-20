@@ -1,7 +1,4 @@
 // api/skincare/catalogo.js
-//
-// GET /api/skincare/catalogo -> { servicos, produtos } (só os ativos).
-// Juntar os dois numa função poupa uma Serverless Function (limite de 12 na Hobby).
 
 import { neon } from '@neondatabase/serverless';
 
@@ -13,6 +10,7 @@ export default async function handler(req, res) {
     }
 
     try {
+        // as duas queries não dependem uma da outra, por isso correm em paralelo
         const [servicos, produtos] = await Promise.all([
             sql`SELECT id, nome, preco, duracao_minutos FROM servicos_skincare WHERE ativo = true ORDER BY nome`,
             sql`SELECT id, nome, preco FROM produtos_skincare WHERE ativo = true ORDER BY nome`,

@@ -21,11 +21,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ erro: 'Data ou hora em formato inválido. Exemplo: 2026-01-28.' });
     }
 
+    //no JSON tem de vir como número (o frontend faz parseInt);
     if (!Number.isInteger(servico_id)) {
         return res.status(400).json({ erro: 'Serviço inválido.' });
     }
 
-    // produtos é opcional — array de { id, nome, preco, quantidade }
+    //array de { id, nome, preco, quantidade }
     const produtosFinal = Array.isArray(produtos) ? produtos : [];
     const produtosValidos = produtosFinal.every((item) =>
         item &&
@@ -34,6 +35,7 @@ export default async function handler(req, res) {
         typeof item.preco === 'number' && item.preco >= 0 &&
         Number.isInteger(item.quantidade) && item.quantidade > 0
         );
+
     if (!produtosValidos) {
         return res.status(400).json({ erro: 'Lista de produtos inválida.' });
     }
@@ -42,13 +44,14 @@ export default async function handler(req, res) {
         return res.status(400).json({ erro: 'O telefone deve ter exatamente 9 dígitos.' });
     }
 
+    // email normalizado (minúsculas, sem espaços) para ficar sempre guardado da mesma forma
     const clienteEmailFinal = String(cliente_email).trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmailFinal)) {
         return res.status(400).json({ erro: 'O email introduzido não é válido.' });
     }
 
     try {
-        // duração do serviço (vem sempre da base de dados, nunca do cliente)
+        //duração do serviço
         const servico = await sql`
             SELECT duracao_minutos FROM servicos WHERE id = ${servico_id} AND ativo = true
         `;
@@ -70,7 +73,7 @@ export default async function handler(req, res) {
 
         const horaFim = deMinutos(paraMinutos(hora) + slots * INTERVALO_SLOT_MINUTOS);
 
-        // sobreposição com marcações ativas: [hora, horaFim) vs [hora, hora_fim)
+        // sobreposição com marcações ativas: [hora, horaFim] vs [hora, hora_fim]
         const jaExiste = await sql`
             SELECT id FROM marcacoes
             WHERE profissional = ${profissional}
@@ -93,7 +96,6 @@ export default async function handler(req, res) {
         return res.status(201).json({ sucesso: true });
     } catch (erro) {
         // 23505 = violação de UNIQUE, 23P01 = violação da constraint de sobreposição
-        // (proteção extra contra corridas em simultâneo)
         if (erro && (erro.code === '23505' || erro.code === '23P01')) {
             return res.status(409).json({ erro: 'Esse horário acabou de ser reservado por outra pessoa. Escolha outro horário.' });
         }

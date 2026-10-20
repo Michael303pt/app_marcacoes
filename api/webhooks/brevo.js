@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ erro: 'Método não permitido' });
   }
 
+  // tal como no cron: sem a variável definida a verificação é saltada e o endpoint fica aberto
   if (process.env.BREVO_WEBHOOK_SECRET) {
     const autorizacao = req.headers['authorization'];
     if (autorizacao !== `Bearer ${process.env.BREVO_WEBHOOK_SECRET}`) {
@@ -49,6 +50,7 @@ export default async function handler(req, res) {
 
   try {
     for (const evento of eventos) {
+      // qualquer outro evento (entregue, aberto, clique...) não interessa aqui
       if (!evento || !EVENTOS_INVALIDOS.has(evento.event)) continue;
 
       // { origem: 'barbershop' | 'skincare', id } — a tag diz de que negócio é o email
@@ -76,6 +78,7 @@ export default async function handler(req, res) {
             LIMIT 1
           `,
         ]);
+        // fica com a mais recente das duas (num empate ganha a barbershop, por causa do >=)
         const b = barbershop[0];
         const s = skincare[0];
         if (b && (!s || b.lembrete_enviado_em >= s.lembrete_enviado_em)) {
@@ -87,6 +90,7 @@ export default async function handler(req, res) {
 
       if (!alvo) continue;
 
+      // o UPDATE é igual nas duas tabelas; só muda o nome, que não dá para passar como parâmetro no sql``
       if (alvo.origem === 'skincare') {
         await sql`
           UPDATE marcacoes_skincare
@@ -134,6 +138,7 @@ function extrairMarcacao(evento) {
 // "marcacao-12" -> barbershop #12; "skincare-7" -> skincare #7
 function interpretarTag(tag, exata) {
   if (typeof tag !== 'string') return null;
+  // com "exata" a tag tem de ser só isto; sem ela aceita o padrão dentro de uma string maior
   const regexBarbershop = exata ? /^marcacao-(\d+)$/ : /marcacao-(\d+)/;
   const regexSkincare = exata ? /^skincare-(\d+)$/ : /skincare-(\d+)/;
 

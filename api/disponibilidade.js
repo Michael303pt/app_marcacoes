@@ -37,10 +37,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ erro: 'Faltam os parâmetros "profissional", "data" e "servico_id".' });
     }
 
+    // só dígitos, para o parseInt mais abaixo não receber lixo
     if (!/^\d+$/.test(servico_id)) {
         return res.status(400).json({ erro: 'Serviço inválido.' });
     }
 
+    // só confere o formato: um dia que não existe (2026-02-31) passa aqui e falha na query;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
         return res.status(400).json({ erro: 'Formato de data inválido. Exemplo: 2026-01-28.' });
     }
@@ -64,7 +66,7 @@ export default async function handler(req, res) {
             ORDER BY hora
         `;
 
-        //marcações ativas nesse dia, como intervalos [hora, hora_fim) (canceladas não contam)
+        //marcações ativas nesse dia, como intervalos [hora, hora_fim] (canceladas não contam)
         const reservados = await sql`
             SELECT hora, hora_fim
             FROM marcacoes
@@ -74,6 +76,7 @@ export default async function handler(req, res) {
         `;
 
         const intervalosOcupados = reservados.map((linha) => ({
+            // o Postgres devolve a hora como "HH:MM:SS"
             inicio: paraMinutos(linha.hora.slice(0, 5)),
             fim: paraMinutos(linha.hora_fim.slice(0, 5)),
         }));
@@ -81,8 +84,6 @@ export default async function handler(req, res) {
         const horasDefinidas = horariosDefinidos.map((linha) => linha.hora.slice(0, 5));
         const setDefinidas = new Set(horasDefinidas);
 
-        // uma hora só está disponível se TODOS os horários que o serviço ocupa
-        // existem no horário de trabalho e nenhum colide com uma marcação existente
         const cabe = (hora) => {
             if (!subHorarios(hora, slots).every((h) => setDefinidas.has(h))) return false;
             const inicio = paraMinutos(hora);
@@ -95,9 +96,9 @@ export default async function handler(req, res) {
         // se a data escolhida for hoje, remove horários que já passaram
         const { data: hojeISO, hora: horaAgora } = HojeDataHora();
         if (data === hojeISO) {
+            // comparar "HH:MM" como texto funciona porque têm sempre 2 dígitos
             disponiveis = disponiveis.filter((hora) => hora > horaAgora);
         } else if (data < hojeISO) {
-            // segurança extra: dia já passado, não há nada disponível
             disponiveis = [];
         }
 
