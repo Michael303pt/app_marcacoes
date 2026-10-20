@@ -7,7 +7,7 @@ GET  ?token=...&acao=confirmar|cancelar -> link do email de lembrete
 
 import disponibilidade from '../../lib/skincare-handlers/disponibilidade.js';
 import reservar from '../../lib/skincare-handlers/reservar.js';
-import confirmarMarcacao from '../../lib/skincare-handlers/confirmar-marcacao.js';
+import confirmarMarcacao from '../../lib/skincare-handlers/confirmar_marcacao.js';
 
 export default async function handler(req, res) {
     if (req.method === 'POST') return reservar(req, res);
