@@ -66,7 +66,8 @@
   nav a:hover::after{ width:100%; }
   .back-link{ display:none; }
   @media (max-width:640px){
-    nav ul{ display:none; }
+    nav ul{ gap:0; }
+    nav ul li:not(.nav-inicio){ display:none; } /* em mobile só fica o "Início" */
   }
 
   /* ---------- hero ---------- */
@@ -195,6 +196,10 @@
     .service-row{ flex-wrap:wrap; }
     .service-desc{ order:3; }
   }
+
+  .products .service-desc{ flex:0; }
+  .products .service-name{ flex:1; }
+  .list-msg{ color:var(--muted); font-family:'Space Mono', monospace; font-size:.88rem; padding:1.5rem 0; }
 
   /* ---------- horas / contacto ---------- */
   .info-grid{

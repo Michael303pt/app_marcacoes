@@ -47,7 +47,10 @@
     transition:color .2s ease;
   }
   nav a:hover{ color:var(--ink); }
-  @media (max-width:640px){ nav ul{ display:none; } }
+  @media (max-width:640px){
+    nav ul{ gap:0; }
+    nav ul li:not(.nav-inicio){ display:none; } /* em mobile só fica o "Início" */
+  }
 
   /* ---------- hero ---------- */
   .hero{
@@ -167,18 +170,21 @@
     background: var(--ink);
     color:#f0f2ec;
   }
-  .apothecary .wrap{
+  .apothecary .section-head h2{ font-family:'Fraunces', serif; font-weight:500; margin-bottom:2rem; }
+  .prod-grid{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
     gap:2rem;
   }
-  @media (max-width:800px){ .apothecary .wrap{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width:800px){ .prod-grid{ grid-template-columns: repeat(2,1fr); } }
+  .list-msg{ color:var(--muted); font-size:.92rem; grid-column:1 / -1; padding:1rem 0; }
+  .apothecary .list-msg{ color:rgba(240,242,236,0.6); }
   .ing{
     border-top:1px solid rgba(240,242,236,0.2);
     padding-top:1.2rem;
   }
   .ing .name{ font-family:'Fraunces', serif; font-style:italic; font-size:1.1rem; margin-bottom:.4rem; }
-  .ing .desc{ font-size:.85rem; color:rgba(240,242,236,0.6); line-height:1.6; }
+  .ing .desc{ font-size:.95rem; color:rgba(240,242,236,0.6); line-height:1.6; }
 
   /* ---------- info ---------- */
   .info-grid{

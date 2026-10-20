@@ -1,5 +1,6 @@
 //calendario.js
 
+// referências aos elementos da página
 const profissional = document.getElementById("profi");
 const inputData = document.getElementById("dataMarcacao");
 const calendario = document.getElementById("calendario");
@@ -18,6 +19,7 @@ const btnCancelarEL = document.getElementById("btnCancelar");
 
 const carrinhoListaEL = document.getElementById("lista-carrinho");
 
+// estado da marcação que está a ser feita
 let horaSelecionada = null;
 let dataSelecionadaISO = null; // formato AAAA-MM-DD, usado na API
 let dataSelecionada = null; // { dia, mes, ano } do dia clicado no calendário
@@ -30,26 +32,30 @@ let carrinho = [
 ];
 */
 
-// telefone: só dígitos, no máximo 9
+//só dígitos, no máximo 9
 clienteContactoEL.addEventListener("input", () => {
     clienteContactoEL.value = clienteContactoEL.value.replace(/\D/g, "").slice(0, 9);
 });
 
+// clicar no campo abre/fecha o popup do calendário
 inputData.addEventListener("click", () => {
     calendario.classList.toggle("ativo");
 });
 
-// input do calendario desativado até sér selecionado um profissional no dropdown
-profissional.addEventListener("change", () => {
-    if (profissional.value === "") {
-        inputData.disabled = true;
-        inputData.value = "";
-    } else {
-        inputData.disabled = false;
-    }
+// input do calendario desativado até serem escolhidos profissional E serviço
+// (a disponibilidade depende da duração do serviço)
+function atualizarEstadoData() {
+    const pronto = profissional.value !== "" && servicoSelecionadoEL.value !== "";
+    inputData.disabled = !pronto;
+    if (!pronto) inputData.value = "";
+}
 
-    // ao trocar de profissional, esconde qualquer lista de horários antiga
-    esconderHorarios();
+// ao trocar de profissional ou de serviço, esconde qualquer lista de horários antiga
+[profissional, servicoSelecionadoEL].forEach((campo) => {
+    campo.addEventListener("change", () => {
+        atualizarEstadoData();
+        esconderHorarios();
+    });
 });
 
 produtoSelecionadoEL.addEventListener("change", () =>{
@@ -67,6 +73,7 @@ produtoSelecionadoEL.addEventListener("change", () =>{
     na variavel igual, que por sua vez aumenta a quantidade +1
     se não insere um novo valor no carrinho
     */
+    // volta o select ao placeholder, para se poder escolher o mesmo produto outra vez (+1)
     produtoSelecionadoEL.value = "";
     const igual = carrinho.find(item => item.id === id);
     if (igual)
@@ -79,6 +86,7 @@ produtoSelecionadoEL.addEventListener("change", () =>{
     atualizarResumo();
 });
 
+// elementos do popup do calendário; btn_EL são as duas setas (mês anterior / seguinte)
 const dias_EL = document.querySelector(".dias");
 const btn_EL = document.querySelectorAll(".calendar_headings .fa-solid");
 const dias_meses_EL = document.querySelector(".month_year");
@@ -102,7 +110,11 @@ let data = date_obj.getDate();
 const hoje_sem_horas = new Date();
 hoje_sem_horas.setHours(0, 0, 0, 0);
 
+// desenha o mês (mes/ano) na grelha: dias do mês anterior a preencher a 1ª semana,
+// os dias do mês, e dias do seguinte para fechar a última semana
 const mostrar_calendario = () => {
+    // getDay(): 0 = domingo ... 6 = sábado. new Date(ano, mes + 1, 0) dá o último dia do mês
+    // (o dia 0 é a véspera do dia 1)
     let primeiro_dia_do_mes = new Date(ano, mes, 1).getDay();
     let ultima_data_do_mes = new Date(ano, mes + 1, 0).getDate();
     let ultimo_dia_do_mes = new Date(ano, mes, ultima_data_do_mes).getDay();
@@ -133,12 +145,14 @@ const mostrar_calendario = () => {
     }
 
     // primeiros dias do próximo mês
+    // completa a última semana até sábado (índice 6)
     for (let x = ultimo_dia_do_mes; x < 6; x++) {
         dias += `<li class="desativo">${x - ultimo_dia_do_mes + 1}</li>`;
     }
 
     dias_EL.innerHTML = dias;
 
+    // só os dias sem a classe "desativo" são clicáveis
     const diasSelecionaveis = dias_EL.querySelectorAll("li:not(.desativo)");
 
     diasSelecionaveis.forEach((dia) => {
@@ -148,13 +162,12 @@ const mostrar_calendario = () => {
             dataSelecionada = { dia: diaSelecionado, mes, ano };
             marcarDiaSelecionado();
 
+            // o input mostra D/M/AAAA (para a pessoa); a API recebe AAAA-MM-DD (o padStart mete o zero)
             inputData.value = `${diaSelecionado}/${mes + 1}/${ano}`;
             dataSelecionadaISO = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(diaSelecionado).padStart(2, "0")}`;
 
             calendario.classList.remove("ativo");
 
-            
-            
             carregarHorariosDisponiveis();
         });
     });
@@ -168,8 +181,6 @@ const mostrar_calendario = () => {
     const estamos_no_mes_atual =
         mes === new Date().getMonth() && ano === new Date().getFullYear();
     btnPrevEL.classList.toggle("desativo", estamos_no_mes_atual);
-
-    
 };
 
 // marca visualmente (classe "selecionado") o dia escolhido pelo utilizador, se pertencer ao mês visível
@@ -196,8 +207,11 @@ btn_EL.forEach((btns) => {
             return;
         }
 
+        // as setas têm id "prev" e "next"
         mes = btns.id === "prev" ? mes - 1 : mes + 1;
 
+        // passou de dezembro/janeiro: o Date acerta sozinho o ano (mês -1 vira dezembro do ano anterior,
+        // mês 12 vira janeiro do seguinte)
         if (mes < 0 || mes > 11) {
             data = new Date(ano, mes, new Date().getDate());
             mes = data.getMonth();
@@ -212,9 +226,8 @@ btn_EL.forEach((btns) => {
 
 //horários disponíveis
 async function carregarHorariosDisponiveis() {
-    if (!profissional.value || !dataSelecionadaISO) return;
+    if (!profissional.value || !servicoSelecionadoEL.value || !dataSelecionadaISO) return;
 
-    formReservaEL.classList.remove("ativo");
     horariosContainerEL.classList.add("ativo");
     listaHorariosEL.innerHTML = `<li class="a_carregar">A carregar horários…</li>`;
 
@@ -224,7 +237,8 @@ async function carregarHorariosDisponiveis() {
     }, 150);
 
     try {
-        const url = `/api/disponibilidade?profissional=${encodeURIComponent(profissional.value)}&data=${dataSelecionadaISO}`;
+        // encodeURIComponent porque o nome do profissional pode ter espaços e acentos
+        const url = `/api/disponibilidade?profissional=${encodeURIComponent(profissional.value)}&data=${dataSelecionadaISO}&servico_id=${encodeURIComponent(servicoSelecionadoEL.value)}`;
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
@@ -239,6 +253,7 @@ async function carregarHorariosDisponiveis() {
         }
 
         listaHorariosEL.innerHTML = "";
+        // um <li> por hora; clicar numa abre o formulário de reserva
         dados.horarios.forEach((hora) => {
             const item = document.createElement("li");
             item.className = "horario_item";
@@ -252,6 +267,8 @@ async function carregarHorariosDisponiveis() {
     }
 }
 
+// repõe tudo o que depende da data (lista, dia selecionado, formulário);
+// chamado quando muda o profissional ou o serviço
 function esconderHorarios() {
     horariosContainerEL.classList.remove("ativo");
     listaHorariosEL.innerHTML = "";
@@ -274,11 +291,10 @@ function abrirFormReserva(hora, elementoSelecionado) {
     clienteNomeEL.value = "";
     clienteContactoEL.value = "";
     clienteEmailEL.value = "";
-    servicoSelecionadoEL.innerHTML = `<option value="">A carregar serviços…</option>`;
     produtoSelecionadoEL.innerHTML = `<option value="">Nenhum</option>`;
+    // nota: o carrinho mantém-se ao trocar de hora (na versão skincare é esvaziado)
     esconderResumo();
     formReservaEL.classList.add("ativo");
-    carregarServicos();
     carregarProdutos();
 
     setTimeout(() => {
@@ -303,6 +319,7 @@ async function carregarServicos() {
             opcao.textContent = servico.preco
                 ? `${servico.nome} — ${Number(servico.preco).toFixed(2)}€`
                 : servico.nome;
+            // nome e preço ficam no dataset para o resumo os ler depois sem voltar ao servidor
             opcao.dataset.nome = servico.nome;
             opcao.dataset.preco = servico.preco;
             servicoSelecionadoEL.appendChild(opcao);
@@ -312,6 +329,34 @@ async function carregarServicos() {
         servicoSelecionadoEL.innerHTML = `<option value="">Erro ao carregar serviços</option>`;
     }
 }
+
+// ao abrir a página vão-se buscar os dados que os selects precisam
+carregarServicos();
+
+async function carregarProfissionais() {
+    try {
+        const resposta = await fetch("/api/profissionais");
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.profissionais || dados.profissionais.length === 0) {
+            profissional.innerHTML = `<option value="" disabled selected hidden>Sem profissionais disponíveis</option>`;
+            return;
+        }
+
+        profissional.innerHTML = `<option value="" disabled selected hidden>escolha o profissional</option>`;
+        dados.profissionais.forEach((p) => {
+            const opcao = document.createElement("option");
+            opcao.value = p.nome;
+            opcao.textContent = p.nome;
+            profissional.appendChild(opcao);
+        });
+    } catch (erro) {
+        console.error(erro);
+        profissional.innerHTML = `<option value="" disabled selected hidden>Erro ao carregar profissionais</option>`;
+    }
+}
+
+carregarProfissionais();
 
 async function carregarProdutos() {
     try {
@@ -371,6 +416,8 @@ function renderCarrinho() {
     }).join("");
 }
 
+// delegação de eventos: um só listener serve todos os botões "-", mesmo os que o renderCarrinho
+// criar depois
 carrinhoListaEL.addEventListener("click", (evento) => {
     const botao = evento.target.closest(".btnRemover");
     if (!botao) return;
@@ -388,6 +435,8 @@ carrinhoListaEL.addEventListener("click", (evento) => {
     atualizarResumo();
 });
 
+// mesmas regras do servidor (api/reservar.js): aqui é só para não deixar enviar à toa,
+// o servidor valida sempre outra vez
 function formularioValido() {
     return (
         servicoSelecionadoEL.value !== "" &&
@@ -410,6 +459,7 @@ function atualizarResumo() {
         return;
     }
 
+    // para só fazer scroll na primeira vez que o resumo aparece
     const resumoJaVisivel = !resumoReservaEL.hidden;
 
     const nomeServico = servicoSelecionadoEL.selectedOptions[0]?.dataset.nome;
@@ -436,7 +486,7 @@ function atualizarResumo() {
             <span><i class="fa-solid fa-clock"></i>${horaSelecionada}</span>
         </div>
         <p><strong>Profissional:</strong> ${profissional.value}</p>
-        <p><strong>Serviço:</strong> ${nomeServico}</p>
+        <p><strong>Serviço:</strong> ${nomeServico} - ${precoServico}</p>
         <p><strong>Produto:</strong> ${produtos || "Nenhum"}</p>
         <p><strong>Total:</strong> ${total}€</p>
         <p><strong>Nome:</strong> ${clienteNomeEL.value.trim()}</p>
@@ -454,6 +504,7 @@ function atualizarResumo() {
     }
 }
 
+// qualquer alteração a estes campos refaz o resumo (que só aparece com tudo válido)
 [servicoSelecionadoEL, produtoSelecionadoEL, clienteNomeEL, clienteContactoEL, clienteEmailEL].forEach((campo) => {
     campo.addEventListener("input", atualizarResumo);
 });
@@ -467,6 +518,7 @@ btnConfirmarEL.addEventListener("click", async () => {
         return;
     }
 
+    // desativa o botão para um duplo clique não criar duas marcações
     btnConfirmarEL.disabled = true;
     msgReservaEL.textContent = "A confirmar…";
 
@@ -498,9 +550,8 @@ btnConfirmarEL.addEventListener("click", async () => {
             return;
         }
 
+        // passado 1,2 s fecha o formulário e recarrega os horários (o que acabou de ser marcado desaparece)
         msgReservaEL.textContent = "Marcação confirmada!";
-        carrinho = [];
-        renderCarrinho();
         setTimeout(() => {
             formReservaEL.classList.remove("ativo");
             btnConfirmarEL.disabled = false;

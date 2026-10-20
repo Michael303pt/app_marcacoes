@@ -18,7 +18,10 @@
     <header>
     <nav class="wrap">
         <a href="barbershop.html" class="logo">Olimpo  <span>Barbershop</span></a>
-        <a href="barbershop.html" class="back-link"><i class="fa-solid fa-arrow-left-long"></i> Voltar</a>
+        <div class="nav-links">
+            <a href="index.html" class="back-link"><i class="fa-solid fa-house"></i> Início</a>
+            <a href="barbershop.html" class="back-link"><i class="fa-solid fa-arrow-left-long"></i> Voltar</a>
+        </div>
     </nav>
     </header>
 
@@ -35,11 +38,14 @@
             <div class="campo-grupo">
                 <label for="profi">Profissional</label>
                 <select name="Profissional" id="profi">
-                    <option value="" disabled selected hidden>escolha o profissional</option>
-                    <option value="Robert Simon">Robert Simon</option>
-                    <option value="Yes1">Yes1</option>
-                    <option value="Yes2">Yes2</option>
-                    <option value="Yes3">Yes3</option>
+                    <option value="" disabled selected hidden>A carregar profissionais…</option>
+                </select>
+            </div>
+
+            <div class="campo-grupo">
+                <label for="servicoSelecionado">Serviço</label>
+                <select id="servicoSelecionado">
+                    <option value="">A carregar serviços…</option>
                 </select>
             </div>
 
@@ -119,7 +125,7 @@
 
     <section class="horarios_marc" id="horariosContainer">
         <div class="horarios_inner">
-            <h3>Horários disprofissional_inneroníveis</h3>
+            <h3>Horários disponíveis</h3>
             <ul class="lista_horarios" id="listaHorarios"></ul>
         </div>
     </section>
@@ -127,11 +133,6 @@
     <section class="form_reserva" id="formReserva">
         <div class="form_reserva_inner">
             <h3>Marcação</h3>
-
-            <label for="servicoSelecionado">Serviço</label>
-            <select id="servicoSelecionado">
-                <option value="">A carregar serviços…</option>
-            </select>
 
             <label for="produtoSelecionado">Produto (opcional)</label>
             <select id="produtoSelecionado">

@@ -1,12 +1,11 @@
 // api/cron/lembrete-marcacoes.js
-//
-// Disparado automaticamente pela Vercel Cron (ver vercel.json), uma vez por
-// dia. Procura marcações que caem daqui a exatamente 3 dias, ainda por
-// confirmar, e envia um email ao cliente com um link para confirmar ou
-// cancelar a marcação.
-//
-// Podes também testar isto manualmente (fora do horário do cron) fazendo
-// um pedido GET à rota com o cabeçalho Authorization correto — ver README.
+
+/* 
+ativado automaticamente pela Vercel Cron (ver vercel.json), uma vez por
+dia. Procura marcações que faltam exatamente 3 dias, ainda por
+confirmar, e envia um email ao cliente com um link para confirmar ou
+cancelar a marcação.
+*/
 
 import { neon } from '@neondatabase/serverless';
 
@@ -16,7 +15,6 @@ import { enviarEmail } from "../../lib/email.js";
 import crypto from "node:crypto";
 
 export default async function handler(req, res) {
-  // protege o endpoint: só aceita pedidos da Vercel Cron (ou com o segredo certo)
   if (process.env.CRON_SECRET) {
     const autorizacao = req.headers["authorization"];
     if (autorizacao !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -25,7 +23,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // marcações agendadas para daqui a 3 dias, ainda sem lembrete enviado
     const marcacoes = await sql`
       SELECT
         m.id,
@@ -48,10 +45,11 @@ export default async function handler(req, res) {
     const resultados = [];
 
     for (const marcacao of marcacoes) {
+      // UUID aleatório
       const token = crypto.randomUUID();
 
       try {
-        // gera e guarda o token ANTES de enviar, para o link no email ser válido
+        //gera e guarda o token antes de enviar, para o link no email ser válido
         await sql`
           UPDATE marcacoes
           SET token_confirmacao = ${token},
@@ -76,9 +74,11 @@ export default async function handler(req, res) {
           para: marcacao.cliente_email,
           nomeDestinatario: marcacao.cliente_nome,
           assunto: "Confirma a tua marcação — Olimpo Barbershop",
+          tags: [`marcacao-${marcacao.id}`],
           html: montarHtmlLembrete({
             nome: marcacao.cliente_nome,
             dataFormatada,
+            //"HH:MM:SS", para no email aparecer com segundos
             hora: marcacao.hora,
             profissional: marcacao.profissional,
             servico: marcacao.servico_nome,
@@ -88,13 +88,13 @@ export default async function handler(req, res) {
           }),
         });
 
-        // só marca como enviado se o email foi mesmo entregue à Brevo com sucesso
         await sql`
           UPDATE marcacoes SET lembrete_enviado_em = now() WHERE id = ${marcacao.id}
         `;
 
         resultados.push({ id: marcacao.id, enviado: true });
       } catch (erroEnvio) {
+        
         console.error(`Falha ao enviar lembrete da marcação ${marcacao.id}:`, erroEnvio);
         resultados.push({ id: marcacao.id, enviado: false, erro: String(erroEnvio) });
       }
@@ -112,8 +112,6 @@ function montarHtmlLembrete({ nome, dataFormatada, hora, profissional, servico, 
   const listaProdutos = Array.isArray(produtos) ? produtos : [];
   const produtosHtml = listaProdutos.length
     ? listaProdutos.map((item) => `${item.nome}${item.quantidade > 1 ? ` x${item.quantidade}` : ""}`).join(", "): null;
-
-
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color:#1b1714;">

@@ -1,8 +1,7 @@
-// api/confirmar-marcacao.js
-//
-// Endpoint aberto no browser quando o cliente clica num dos dois links do
-// email de lembrete. Não é chamado pelo frontend (calendario.js) — é acedido
-// diretamente pelo cliente a partir do email.
+/* api/confirmar-marcacao.js
+Endpoint aberto no browser quando o cliente clica num dos dois links do
+email de lembrete. Não é chamado pelo frontend (calendario.js)
+diretamente pelo cliente a partir do email.*/
 
 
 import { neon } from '@neondatabase/serverless';
@@ -11,13 +10,16 @@ const sql = neon(process.env.DATABASE_URL);
 
 
 export default async function handler(req, res) {
+  //query string porque o cliente vem de um link no email (GET)
   const { token, acao } = req.query;
 
+  // "acao" só pode ser uma destas duas; qualquer outra coisa é um link mexido à mão
   if (!token || !["confirmar", "cancelar"].includes(acao)) {
     return paginaResposta(res, 400, "Pedido inválido", "O link que usaste não é válido.");
   }
 
   try {
+  //o token é um UUID aleatório criado no cron — funciona como "senha" da marcação
   const linhas = await sql`
     SELECT id, cliente_nome, status
     FROM marcacoes
@@ -32,10 +34,12 @@ export default async function handler(req, res) {
     );
   }
 
+  //impede cancelamentos de serem ativos de novo
   if (marcacao.status === "cancelada") {
     return paginaResposta(res, 200, "Marcação já cancelada", "Esta marcação já tinha sido cancelada anteriormente.");
   }
 
+  //o nome entra no HTML sem escape; na versão skincare já passa por escapeHtml
   if (acao === "confirmar") {
     await sql`UPDATE marcacoes SET status = 'confirmada' WHERE id = ${marcacao.id}`;
     return paginaResposta(
@@ -44,7 +48,6 @@ export default async function handler(req, res) {
     );
   }
 
-  // acao === "cancelar"
   await sql`UPDATE marcacoes SET status = 'cancelada' WHERE id = ${marcacao.id}`;
   return paginaResposta(
     res, 200, "Marcação cancelada",
@@ -59,6 +62,7 @@ export default async function handler(req, res) {
 }
 }
 
+// página HTML simples, para o cliente não ver JSON ao clicar no link do email
 function paginaResposta(res, statusCode, titulo, mensagem) {
   res.status(statusCode).setHeader("Content-Type", "text/html; charset=utf-8");
   res.send(`<!DOCTYPE html>

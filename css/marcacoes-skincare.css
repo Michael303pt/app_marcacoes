@@ -1,0 +1,490 @@
+/* marcacoes-skincare.css
+   Página de marcações da Skincare — mesma estrutura da barbershop, tema claro.
+   Paleta e tipografia iguais às de skincare.css. */
+
+:root {
+  --bg: #f0f2ec;
+  --surface: #ffffff;
+  --surface-2: #f6f7f3;
+  --sage: #7c8b6f;
+  --sage-dark: #5c6753;
+  --clay: #d9a8a0;
+  --clay-dark: #b9776d;
+  --ink: #2e3428;
+  --muted: #78806e;
+  --line: rgba(46, 52, 40, 0.12);
+  --erro: #b4443a;
+  --sombra: 0 10px 30px rgba(46, 52, 40, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+a { color: inherit; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 6vw; }
+
+/* ---------- cabeçalho ---------- */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(240, 242, 236, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(46, 52, 40, 0.08);
+}
+
+nav.wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 1.4rem; padding-bottom: 1.4rem;
+}
+
+.logo {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.3rem;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.back-link {
+  text-decoration: none;
+  font-size: .85rem;
+  letter-spacing: .03em;
+  color: var(--muted);
+  display: flex; align-items: center; gap: .5rem;
+  transition: color .2s ease;
+}
+.back-link:hover { color: var(--ink); }
+
+/* ---------- intro ---------- */
+.marc-intro { padding: 3.4rem 0 2rem; }
+
+.marc-intro .eyebrow {
+  font-size: .75rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--sage-dark);
+  margin-bottom: 1rem;
+}
+
+.marc-intro h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(2.2rem, 5.5vw, 3.2rem);
+  line-height: 1.05;
+}
+
+.marc-intro .lead {
+  margin-top: .9rem;
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 46ch;
+  line-height: 1.7;
+}
+
+/* ---------- seleção de tratamento / data ---------- */
+.seletor {
+  display: flex; justify-content: center;
+  padding: 0 6vw 2.4rem;
+}
+
+.seletor_inner {
+  width: 100%; max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1.5rem;
+  display: flex; flex-direction: column; gap: 1.1rem;
+  box-shadow: var(--sombra);
+}
+
+.campo-grupo { display: flex; flex-direction: column; }
+
+.campo-grupo label,
+.form_reserva_inner label {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--sage-dark);
+  margin-bottom: .5rem;
+}
+
+#servicoSelecionado,
+.campo-data_input input,
+.form_reserva_inner input,
+.form_reserva_inner select {
+  width: 100%;
+  padding: .75rem .9rem;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  background-color: var(--surface-2);
+  color: var(--ink);
+  font-family: 'Work Sans', sans-serif;
+  font-size: .92rem;
+  transition: border-color .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+
+#servicoSelecionado,
+.form_reserva_inner select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%235c6753' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right .9rem center;
+  padding-right: 2.4rem;
+  cursor: pointer;
+}
+
+#servicoSelecionado option,
+.form_reserva_inner select option {
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+#servicoSelecionado:hover, #servicoSelecionado:focus,
+.campo-data_input input:not(:disabled):hover,
+.campo-data_input input:not(:disabled):focus,
+.form_reserva_inner input:hover, .form_reserva_inner input:focus,
+.form_reserva_inner select:hover, .form_reserva_inner select:focus {
+  border-color: var(--sage);
+  outline: none;
+}
+
+#servicoSelecionado:focus-visible,
+.campo-data_input input:focus-visible,
+.form_reserva_inner input:focus-visible,
+.form_reserva_inner select:focus-visible {
+  box-shadow: 0 0 0 3px rgba(124, 139, 111, 0.25);
+}
+
+.campo-data_input { position: relative; display: flex; align-items: center; }
+
+.campo-data_input i {
+  position: absolute; left: .9rem;
+  color: var(--sage-dark);
+  font-size: .85rem;
+  pointer-events: none;
+}
+
+.campo-data_input input { padding-left: 2.3rem; cursor: pointer; }
+.campo-data_input input::placeholder { color: var(--muted); }
+.campo-data_input input:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---------- calendário ---------- */
+.calendario_marc,
+.horarios_marc,
+.form_reserva {
+  display: grid;
+  grid-template-rows: 0fr;
+  justify-items: center;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 6vw;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease,
+              padding .45s cubic-bezier(.4,0,.2,1);
+}
+
+.calendario_marc.ativo { grid-template-rows: 1fr; opacity: 1; padding: .4rem 6vw 3rem; }
+.horarios_marc.ativo   { grid-template-rows: 1fr; opacity: 1; padding: .4rem 6vw 3rem; }
+.form_reserva.ativo    { grid-template-rows: 1fr; opacity: 1; padding: .4rem 6vw 4rem; }
+
+/* conteúdo fechado não deve ser focável por teclado */
+.calendario_marc:not(.ativo),
+.horarios_marc:not(.ativo),
+.form_reserva:not(.ativo) { visibility: hidden; transition-property: grid-template-rows, opacity, padding, visibility; transition-duration: .45s, .3s, .45s, 0s; transition-delay: 0s, 0s, 0s, .45s; }
+
+.calendario_marc > .calendario { min-height: 0; }
+
+.calendario {
+  background-color: var(--surface);
+  color: var(--ink);
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  max-width: 480px; width: 100%;
+  box-shadow: var(--sombra);
+}
+
+.inner_calendario { padding: 1.6rem 1.7rem 1.8rem; }
+
+.calendario_controlos { padding-bottom: .4rem; }
+
+.calendar_headings {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .3rem 0;
+}
+
+.month_year {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: var(--sage-dark);
+}
+
+.fa-solid.fa-arrow-right,
+.fa-solid.fa-arrow-left {
+  cursor: pointer;
+  font-size: .95rem;
+  color: var(--ink);
+  width: 2.2rem; height: 2.2rem;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  transition: background-color .2s ease, color .2s ease;
+}
+.fa-solid.fa-arrow-right:hover,
+.fa-solid.fa-arrow-left:hover { background-color: var(--sage-dark); color: #fff; }
+
+.data { margin-top: 1.1rem; }
+.data ul { list-style: none; }
+
+.data .dias_semana, .dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.data .dias_semana li {
+  border-bottom: 1px solid var(--line);
+  margin: 0 .15rem .6rem;
+  padding-bottom: .5rem;
+  font-size: .7rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.data li {
+  padding: .5rem;
+  margin: .15rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border-radius: 3px;
+  color: var(--ink);
+  font-size: .9rem;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.data .dias li:hover { background-color: var(--sage-dark); color: #fff; }
+
+.data .dias li.hoje {
+  background: transparent;
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1.5px var(--clay);
+}
+.data .dias li.hoje:hover { box-shadow: none; }
+
+.data .dias li.selecionado {
+  background-color: var(--sage-dark);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.data .desativo { color: #b6bbae; }
+.data li.desativo:hover { color: #b6bbae; background-color: transparent; }
+.data li.desativo, .data li.desativo.passado { cursor: default; }
+
+#prev.desativo { opacity: .3; pointer-events: none; cursor: default; }
+
+/* ---------- horários disponíveis ---------- */
+.horarios_marc > .horarios_inner {
+  min-height: 0; width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.horarios_marc h3 {
+  width: 100%; max-width: 480px;
+  margin-bottom: 1rem;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: var(--sage-dark);
+  padding-bottom: .7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.lista_horarios {
+  list-style: none;
+  width: 100%; max-width: 480px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .6rem;
+}
+
+.horario_item {
+  background-color: var(--surface);
+  color: var(--ink);
+  text-align: center;
+  padding: .7rem .3rem;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: .88rem;
+  font-variant-numeric: tabular-nums;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.horario_item:hover { border-color: var(--sage); background-color: var(--surface-2); }
+.horario_item.selecionado { background-color: var(--sage-dark); border-color: var(--sage-dark); color: #fff; }
+
+.lista_horarios .a_carregar,
+.lista_horarios .erro,
+.lista_horarios .vazio {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: .8rem;
+  cursor: default;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+}
+.lista_horarios .erro { color: var(--erro); }
+
+@media (max-width: 420px) {
+  .lista_horarios { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------- formulário de marcação ---------- */
+.form_reserva > .form_reserva_inner { min-height: 0; }
+
+.form_reserva_inner {
+  background-color: var(--surface);
+  color: var(--ink);
+  width: 100%; max-width: 480px;
+  padding: 1.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  box-shadow: var(--sombra);
+}
+
+.form_reserva_inner h3 {
+  margin-bottom: 1rem;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.3rem;
+  color: var(--sage-dark);
+  padding-bottom: .8rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.form_reserva_inner label { display: block; margin-top: 1rem; margin-bottom: 0; }
+.form_reserva_inner input, .form_reserva_inner select { margin-top: .45rem; }
+.form_reserva_inner input::placeholder { color: var(--muted); }
+
+.campo-nota { margin-top: .45rem; font-size: .78rem; color: var(--muted); line-height: 1.5; }
+
+#lista-carrinho {
+  list-style: none;
+  margin-top: .5rem;
+  display: flex; flex-direction: column; gap: .5rem;
+}
+
+.item-produto {
+  display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+  padding: .5rem .7rem;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.nome-produto { font-size: .85rem; color: var(--ink); }
+
+.btnRemover {
+  background: transparent;
+  color: var(--clay-dark);
+  border: 1px solid rgba(185, 119, 109, 0.5);
+  min-width: 2rem; height: 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Work Sans', sans-serif;
+  font-size: .9rem;
+  transition: background-color .15s ease, color .15s ease;
+}
+.btnRemover:hover { background-color: var(--clay-dark); color: #fff; }
+
+.resumo_final {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: rgba(124, 139, 111, 0.1);
+  border: 1px solid rgba(124, 139, 111, 0.3);
+  font-size: .9rem;
+}
+.resumo_final[hidden] { display: none; }
+
+.resumo_datahora {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: .6rem;
+  padding-bottom: .7rem; margin-bottom: .6rem;
+  border-bottom: 1px dashed rgba(92, 103, 83, 0.4);
+  font-weight: 600;
+  color: var(--sage-dark);
+}
+.resumo_datahora i { margin-right: .4rem; }
+
+.resumo_final p { margin: .3rem 0; overflow-wrap: anywhere; }
+.resumo_final strong { color: var(--sage-dark); font-weight: 500; }
+
+.msg_reserva {
+  min-height: 1.2rem;
+  margin-top: .8rem;
+  font-size: .88rem;
+  text-align: center;
+  color: var(--sage-dark);
+}
+.msg_reserva.erro { color: var(--erro); }
+
+.form_botoes { display: flex; gap: .7rem; margin-top: 1rem; }
+
+.form_botoes button {
+  flex: 1;
+  padding: .85rem;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 500;
+  letter-spacing: .03em;
+  font-size: .85rem;
+  transition: transform .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.form_botoes button[hidden] { display: none; }
+
+#btnConfirmar { background: var(--sage-dark); color: #fff; }
+#btnConfirmar:not(:disabled):hover { background: var(--ink); transform: translateY(-2px); }
+#btnConfirmar:disabled { opacity: .5; cursor: not-allowed; }
+
+#btnCancelar {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line) !important;
+}
+#btnCancelar:hover { color: var(--ink); border-color: var(--ink) !important; }
+
+@media (max-width: 520px) {
+  .inner_calendario { padding: 1.2rem 1rem 1.4rem; }
+  .form_reserva_inner { padding: 1.3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .calendario_marc, .horarios_marc, .form_reserva { transition: none; }
+}

@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     try {
         const servicos = await sql`
-            SELECT id, nome, preco
+            SELECT id, nome, preco, duracao_minutos
             FROM servicos
             WHERE ativo = true
             ORDER BY nome

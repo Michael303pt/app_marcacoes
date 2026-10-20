@@ -17,9 +17,11 @@
   <nav class="wrap">
     <a href="#" class="logo">Olimpo Skincare</a>
     <ul>
+      <li class="nav-inicio"><a href="index.html">Início</a></li>
       <li><a href="#tratamentos">Tratamentos</a></li>
-      <li><a href="#ingredientes">Produtos</a></li>
+      <li><a href="#produtos">Produtos</a></li>
       <li><a href="#contacto">Contacto</a></li>
+      <li><a href="marcacoes-skincare.html">Marcações</a></li>
     </ul>
   </nav>
 </header>
@@ -31,7 +33,7 @@
       <h1>A sua pele, em rotina.</h1>
       <p class="lead">Tratamentos personalizados para cada tipo de pele</p>
       <div class="actions">
-        <a href="#contacto" class="btn primary">Marcar consulta</a>
+        <a href="marcacoes-skincare.html" class="btn primary">Marcar consulta</a>
         <a href="#tratamentos" class="btn ghost">Ver tratamentos</a>
       </div>
     </div>
@@ -53,66 +55,20 @@
   <div class="wrap">
     <div class="section-head">
       <h2>Tratamentos</h2>
-      <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.</p>
     </div>
-    <div class="treat-grid">
-      <div class="treat-card">
-        <div class="num">01</div>
-        <h3>Limpeza de pele</h3>
-        <p>Duplo limpeza, esfoliação suave e extração cuidada, com máscara calmante no final.</p>
-        <div class="price">45€ · 60 min</div>
-      </div>
-      <div class="treat-card">
-        <div class="num">02</div>
-        <h3>Limpeza de pele</h3>
-        <p>Duplo limpeza, esfoliação suave e extração cuidada, com máscara calmante no final.</p>
-        <div class="price">45€ · 60 min</div>
-      </div>
-      <div class="treat-card">
-        <div class="num">03</div>
-        <h3>Limpeza de pele</h3>
-        <p>Duplo limpeza, esfoliação suave e extração cuidada, com máscara calmante no final.</p>
-        <div class="price">45€ · 60 min</div>
-      </div>
-      <div class="treat-card">
-        <div class="num">04</div>
-        <h3>Limpeza de pele</h3>
-        <p>Duplo limpeza, esfoliação suave e extração cuidada, com máscara calmante no final.</p>
-        <div class="price">45€ · 60 min</div>
-      </div>
-      <div class="treat-card">
-        <div class="num">05</div>
-        <h3>Limpeza de pele</h3>
-        <p>Duplo limpeza, esfoliação suave e extração cuidada, com máscara calmante no final.</p>
-        <div class="price">45€ · 60 min</div>
-      </div>
-      <div class="treat-card">
-        <div class="num">06</div>
-        <h3>Limpeza de pele</h3>
-        <p>Duplo limpeza, esfoliação suave e extração cuidada, com máscara calmante no final.</p>
-        <div class="price">45€ · 60 min</div>
-      </div>
+    <div class="treat-grid" id="lista-tratamentos">
+      <p class="list-msg">A carregar tratamentos…</p>
     </div>
   </div>
 </section>
 
-<section class="apothecary" id="ingredientes">
+<section class="apothecary" id="produtos">
   <div class="wrap">
-    <div class="ing">
-      <div class="name">Camomila</div>
-      <div class="desc">Acalma vermelhidão e irritação, ideal para peles sensíveis.</div>
+    <div class="section-head">
+      <h2>Produtos</h2>
     </div>
-    <div class="ing">
-      <div class="name">Camomila</div>
-      <div class="desc">Acalma vermelhidão e irritação, ideal para peles sensíveis.</div>
-    </div>
-    <div class="ing">
-      <div class="name">Camomila</div>
-      <div class="desc">Acalma vermelhidão e irritação, ideal para peles sensíveis.</div>
-    </div>
-    <div class="ing">
-      <div class="name">Camomila</div>
-      <div class="desc">Acalma vermelhidão e irritação, ideal para peles sensíveis.</div>
+    <div class="prod-grid" id="lista-produtos">
+      <p class="list-msg">A carregar produtos…</p>
     </div>
   </div>
 </section>
@@ -145,6 +101,61 @@
     <a class="home" href="index.html">← Voltar à página inicial</a>
   </div>
 </footer>
+
+<script>
+const formatarPreco = (v) => {
+  const n = Number(v);
+  return (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',')) + '€';
+};
+
+function mensagem(el, txt) {
+  const p = document.createElement('p');
+  p.className = 'list-msg';
+  p.textContent = txt;
+  el.replaceChildren(p);
+}
+
+function el(tag, cls, txt) {
+  const e = document.createElement(tag);
+  e.className = cls;
+  e.textContent = txt;
+  return e;
+}
+
+fetch('/api/skincare/catalogo')
+  .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(({ servicos, produtos }) => {
+    const gt = document.getElementById('lista-tratamentos');
+    if (!servicos || !servicos.length) mensagem(gt, 'Sem tratamentos disponíveis.');
+    else {
+      gt.replaceChildren();
+      servicos.forEach((s, i) => {
+        const card = el('div', 'treat-card', '');
+        card.append(
+          el('div', 'num', String(i + 1).padStart(2, '0')),
+          el('h3', '', s.nome),
+          el('div', 'price', formatarPreco(s.preco) + (s.duracao_minutos ? ' · ' + s.duracao_minutos + ' min' : ''))
+        );
+        gt.appendChild(card);
+      });
+    }
+
+    const gp = document.getElementById('lista-produtos');
+    if (!produtos || !produtos.length) mensagem(gp, 'Sem produtos disponíveis.');
+    else {
+      gp.replaceChildren();
+      produtos.forEach((p) => {
+        const card = el('div', 'ing', '');
+        card.append(el('div', 'name', p.nome), el('div', 'desc', formatarPreco(p.preco)));
+        gp.appendChild(card);
+      });
+    }
+  })
+  .catch(() => {
+    mensagem(document.getElementById('lista-tratamentos'), 'Não foi possível carregar os tratamentos.');
+    mensagem(document.getElementById('lista-produtos'), 'Não foi possível carregar os produtos.');
+  });
+</script>
 
 </body>
 </html>
